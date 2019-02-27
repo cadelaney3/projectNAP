@@ -15,12 +15,12 @@ text_analytics_base_url = 'https://westus.api.cognitive.microsoft.com/text/analy
 
 azure_headers   = {"Ocp-Apim-Subscription-Key": subscription_key, 'Content-Type': 'application/json', 'Accept': 'application/json',}
 
-DEBUG = True
-app = Flask(__name__)
+#DEBUG = True
+application = Flask(__name__)
 #Bootstrap(app)
 
-app.config.from_object(__name__)
-app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
+application.config.from_object(__name__)
+application.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
 
 import sys
@@ -338,7 +338,7 @@ def IBM_concepts(text):
             categories=CategoriesOptions()
             )).get_result()
 
-@app.route('/', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 def hello_world():
 
     form = ReusableForm(request.form)
@@ -424,4 +424,4 @@ def hello_world():
                            ibm_dict=ibm_dict)
 
 if __name__ == "__main__":
-    app.run()
+    application.run()
