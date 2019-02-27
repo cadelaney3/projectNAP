@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "propane-ripsaw-231003",
+  "private_key_id": "06f28cd2726972295a969a7a875de94569dc2787",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDOuyWWLdB2d4nj\ntXeNNUadyQ2Pq+Vkntp9D/4hLQ7cf/QqFetDYvBWCjTI428P34AxGhoo1x59mrJa\nhCtQIDLkQlFtFbvN/pJGE0XsbV1Jqp7ixg2vqTzaBQu09N0t/kY0izrDyA9RIPr+\nedCuR1+LBFfZBm+B1LZI46I1S+UVAXh6cbhvQN3eV8tjRRSKZETc1tGPopblZH3j\nSf2RvusobkO11PdHuPPIktOcPGsgCZlb25NzLrooitr31GV857hsRFiWXuUuq2IQ\nmkvyOh4D4q7I9HFU6rPLNvvL0pIwKg5ycudjUkDH5a/n3bWnh/4g6Smz1hNjB6rq\nDWC3N4CtAgMBAAECggEAGgUeqjwaeqq5kY5X3Y9Y08fIO+7aGNPQssCGTzUtY238\ndKadHbZwgxfWRHmx0yjhqOx84eqPlSYZMEDl9bgTx7ycJJOBd6BE12qaGLO8M+c0\nh9z/QH6X4OYVLuHKC/2u5vKmQxmlaePxi4GYFTN5EFWL3A5ODySPi/WQx04F56J1\nlurZovw5t1sC8k7Y8pPQ5xJx4lX7FIiUVx1su/P/7FxmY6TyXbMN0PYmsSkODp9u\nL7+n27gepTerK9b2BSjXJlE5t7CUnpeDzL00LZwYLsIsqMrAwK68aqKkZUnfnw+c\nPFEkfNx1f3szA3PcrdtuAcSiFM+qw8yANFd4Q8WruQKBgQDnKLluBrCUMKSo6urA\ngDLhBlaNzEI5xPaEpChp3PX7pbd9CeqrbBbvYgBPDnb+l5sMarS0TZZ+lMCEWyqO\nVxcY826OKRIsXbg15aP6OOtCYGEUSKfxgjHCYeQYNN4fTgix2+L61ZivKq/6Fs4G\nFLgfn3iXSlGHTIQdMS6V6w5mKQKBgQDk8mXSOwIuFfxeLegAvoN+ZE4BPxgKD6B+\nqPm/jANe3lexS3ilU8uOm1kvAP8agHy9TfOPSjd2Rv4F19XYOu5KYnhzrdHqIhwq\nVi2mQuC0pdSf7PKFCf0F4gxSfNachND+vZO1Z3/JNxU/bcy3SWE5z+5AutJfde42\nir01gPzu5QKBgQCByBiL0I+1M7ZO7E3OtGtccY2I4SRRgOcTQ4M5JIiqt7jUKAws\nIGykC/a2bB2dBQtVJle8X09eVC/eX7z926GpLYtln2OHqzqwb/TnmKtlQe1fUQeR\njZJYW1OPz6biFpLFIPpH8EJgHmxc0g7r1RgnEQbIkj5B41DNfv5zx1v3OQKBgQCu\nBvMO0nvdvCiRDiQELMyXDnecyvDi9O3yWU8+IpeNTUUrJ0sVoJRiWgN4jzFaW8B1\nxQMWMDvoVB5TIrUSH/lx4Vfd1opxhmwSYl9gugVES6lLxzixl94U0ra7HNmlL/AN\nMt1MTtf7gztLc5Lg345f+4YG/ftbRLFGFD+uo9WfYQKBgBU5gHlNB5ali7V4RxzP\nkLJcbZJ6YniH4dv+ObotrYk4ROm+LxKK6P26EVtHl4vlvf8tYy8yKO9d4QY7qe9e\nQwLKi5PRKoQDzmKPHidKwDYF0oBqt/OoSJwAM6aETP52L/YS+l2zLS/kvX2C5T0o\n97reyEHp+MRqoHCvhaabrbLM\n-----END PRIVATE KEY-----\n",
+  "client_email": "text-analytics@propane-ripsaw-231003.iam.gserviceaccount.com",
+  "client_id": "105889176616697425997",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/text-analytics%40propane-ripsaw-231003.iam.gserviceaccount.com"
+}

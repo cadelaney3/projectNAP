@@ -5,28 +5,37 @@ from flask_bootstrap import Bootstrap
 import requests
 import json
 from pprint import pprint
+with open('./constants.json') as f:
+    CONSTANTS = json.load(f)
 
 subscription_key = 'ad9bd37163ed470cabc3d324f3d6ca5c'
 subscription_key2 = '459ba66d7fe949cc8f38020a681ebfde'
 assert subscription_key
 assert subscription_key2
 
+AZURE_KEY = CONSTANTS['AZURE_CREDENTIALS']['AZURE_KEY']
+GOOGLE_APPLICATION_CREDENTIALS = CONSTANTS['GOOGLE_CREDENTIALS']
+IBM_APIKEY = CONSTANTS['IBM_CREDENTIALS']['IBM_APIKEY']
+IBM_URL = CONSTANTS['IBM_CREDENTIALS']['IBM_URL']
+AWS_ACCESS_KEY = CONSTANTS['AWS_CREDENTIALS']['AWSAccessKeyId']
+AWS_SECRET_KEY = CONSTANTS['AWS_CREDENTIALS']['AWSSecretKey']
+
 text_analytics_base_url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/'
 
-azure_headers   = {"Ocp-Apim-Subscription-Key": subscription_key, 'Content-Type': 'application/json', 'Accept': 'application/json',}
+azure_headers   = {"Ocp-Apim-Subscription-Key": AZURE_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json',}
 
 #DEBUG = True
 application = Flask(__name__)
 #Bootstrap(app)
 
-#application.config.from_object(__name__)
-#application.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
+application.config.from_object(__name__)
+application.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
 
 import sys
 import os
 
-credential_path = "/home/cdswaggy/Downloads/My_First_Project-06f28cd27269.json"
+credential_path = "./google_creds.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 # Imports the Google Cloud client library
@@ -40,16 +49,16 @@ client = language.LanguageServiceClient()
 
 # [END language_sentiment_text]
 
-AWSAccessKeyId='AKIAJEC4HYYBKZNCAMIA'
-AWSSecretKey='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'
+AWSAccessKeyId=AWS_ACCESS_KEY#'AKIAJEC4HYYBKZNCAMIA'
+AWSSecretKey=AWS_SECRET_KEY#'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'
 
 import boto3
-comprehend = boto3.client(service_name='comprehend', aws_access_key_id=AWSAccessKeyId,
-    aws_secret_access_key=AWSSecretKey, region_name='us-west-2')
+comprehend = boto3.client(service_name='comprehend', aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY, region_name='us-west-2')
 
 ####################################
-IBM_APIKEY='fj6-S0o3vni_GPO9ARhV96ZAL_4YKf-D6c_XfRYROgmz'
-IBM_URL='https://gateway.watsonplatform.net/natural-language-understanding/api'
+#IBM_APIKEY='fj6-S0o3vni_GPO9ARhV96ZAL_4YKf-D6c_XfRYROgmz'
+#IBM_URL='https://gateway.watsonplatform.net/natural-language-understanding/api'
 ######################################
 
 import json
@@ -424,4 +433,4 @@ def hello_world():
                            ibm_dict=ibm_dict)
 
 if __name__ == "__main__":
-    application.run()
+    application.run(host='0.0.0.0')
