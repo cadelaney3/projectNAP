@@ -1,37 +1,145 @@
+<!doctype html>
 <title>Text Analytics</title>
-<link rel="stylesheet" media="screen" href="static/bootstrap.min.css">
-<link rel="stylesheet" href="static/bootstrap-theme.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<!-- <link rel="stylesheet" type="text/css" href="static/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="static/css/bootstrap-theme.min/css"> -->
+<!-- {% block content %} -->
+<!-- <link rel="stylesheet" media="screen" href="static/css/bootstrap.css"> -->
+<!-- <link rel="stylesheet" href="static/bootstrap-theme.min.css"> -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="container">
-<h2>Flask Web Form</h2>
+<h2>Text Analytics API Comparison</h2>
+</div>
+<section class="content">
 <form action="" method="post">
 {{ form.csrf }}
 <div class="form-group">
 <label for="textbox">Text:</label>
-<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter you text here..." rows=15></textarea>
+<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter you text here..." rows=10></textarea>
 </div>
 <button type="submit" class="btn btn-success">Submit</button>
 </form>
-<div class="btn-group" role="group" aria-label="APIs">
-  <button type="button" class="btn btn-secondary">Google</button>
-  <button type="button" class="btn btn-secondary">Azure</button>
-  <button type="button" class="btn btn-secondary">Amazon</button>
-  <button type="button" class="btn btn-secondary">IBM</button>
-</div>
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for message in messages %}
-            {% if "Error" not in message[1]: %}
-                <div class="alert alert-info">
-                {{ message[1] }}</div>
-            {% endif %}
+<ul class="nav nav-tabs" id="api-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="true">Google</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="azure-tab" data-toggle="tab" href="#azure" role="tab" aria-controls="azure" aria-selected="false">Azure</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="amazon-tab" data-toggle="tab" href="#amazon" role="tab" aria-controls="amazon" aria-selected="false">Amazon</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="ibm-tab" data-toggle="tab" href="#ibm" role="tab" aria-controls="ibm" aria-selected="false">IBM</a>
+    </li>
+</ul>
+<div class="tab-content" id="api-tab-content">
+    <div class="tab-pane fade show active" id="google" role="tabpanel" aria-labelledby="google-tab">
+        <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-tabs" id="nav-tab" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link active" id="g-sent-tab" data-toggle="tab" href="#g-sent" role="tab" aria-controls="g-sent" aria-selected="true">Sentiment</a>
+                    <a class="nav-link" id="g-ent-tab" data-toggle="tab" href="#g-ent" role="tab" aria-controls="g-ent" aria-selected="false">Entities</a>
+                    <a class="nav-link" id="g-class-tab" data-toggle="tab" href="#g-class" role="tab" aria-controls="g-class" aria-selected="false">Classification</a>
+                    <a class="nav-link" id="g-syn-tab" data-toggle="tab" href="#g-syn" role="tab" aria-controls="g-syn" aria-selected="false">Syntax</a>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="tab-content" id="g-tabContent">
+                    <div class="tab-pane fade show active" id="g-sent" role="tabpanel" aria-labelledby="g-sent-tab">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sentiment</th>
+                                    <th scope="col">Magnitude</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ google_dict['sentiment'] }}</td>
+                                    <td>{{ google_dict['magnitude'] }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="g-ent" role="tabpanel" aria-labelledby="g-ent-tab">
+                        <ul class="list-group">
+                            {% for ent in google_dict['entitites'] %}
+                                <li class="list-group-item">ent</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="g-class" role="tabpanel" aria-labelledby="g-class-tab">
+                        <ul class="list-group">
+                            {% for ent in google_dict['entitites'] %}
+                                <li class="list-group-item">ent</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="g-syn" role="tabpanel" aria-labelledby="g-syn-tab"></div>
+                        <ul class="list-group">
+                        {% for ent in google_dict['entitites'] %}
+                            <li class="list-group-item">ent</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            {% if "Error" in message[1]: %}
-                <div class="alert alert-warning">
-                {{ message[1] }}</div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
+    <div class="tab-pane fade" id="azure" role="tabpanel" aria-labelledby="azure-tab">
+        <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Sentiment</th>
+                        <!-- <th scope="col">Magnitude</th> -->
+                    </tr>
+                </thead>
+            <tbody>
+                <tr>
+                    <td>{{ azure_dict['sentiment'] }}</td>
+                    <!-- <td>{{ google_dict['magnitude'] }}</td> -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="tab-pane fade" id="amazon" role="tabpanel" aria-labelledby="amazon-tab">
+        <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Positive Sentiment</th>
+                        <th scope="col">Negative Sentiment</th>
+                        <th scope="col">Neutral Sentiment</th>
+                    </tr>
+                </thead>
+            <tbody>
+                <tr>
+                    <td>{{ amazon_dict['pos_sentiment'] }}</td>
+                    <td>{{ amazon_dict['neg_sentiment'] }}</td>
+                    <td>{{ amazon_dict['neut_sentiment'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="tab-pane fade" id="ibm" role="tabpanel" aria-labelledby="ibm-tab">
+        <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Sentiment</th>
+                        <!-- <th scope="col">Magnitude</th> -->
+                    </tr>
+                </thead>
+            <tbody>
+                <tr>
+                    <td>{{ ibm_dict['sentiment'] }}</td>
+                    <!-- <td>{{ google_dict['magnitude'] }}</td> -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+</section>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

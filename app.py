@@ -12,15 +12,13 @@ assert subscription_key
 assert subscription_key2
 
 text_analytics_base_url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/'
-azure_sentiment_url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment'
-azure_entities_url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.1-preview/entities'
-azure_key_phrases_url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases'
 
-headers   = {"Ocp-Apim-Subscription-Key": subscription_key, 'Content-Type': 'application/json', 'Accept': 'application/json',}
+azure_headers   = {"Ocp-Apim-Subscription-Key": subscription_key, 'Content-Type': 'application/json', 'Accept': 'application/json',}
 
 DEBUG = True
 app = Flask(__name__)
-Bootstrap(app)
+#Bootstrap(app)
+
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
@@ -48,13 +46,6 @@ AWSSecretKey='qqzeXN+2OmvOcyyJkWZlkt2sfEzyCyLBT0l9xrZA'
 import boto3
 comprehend = boto3.client(service_name='comprehend', aws_access_key_id=AWSAccessKeyId,
     aws_secret_access_key=AWSSecretKey, region_name='us-west-2')
-text = "It is raining today in Seattle"
-
-print('Calling DetectSentiment')
-test = json.dumps(comprehend.detect_sentiment(Text=text, LanguageCode='en'), sort_keys=True, indent=4)
-sent_score = test[1]
-print(sent_score)
-print('End of DetectSentiment\n')
 
 ####################################
 IBM_APIKEY='fj6-S0o3vni_GPO9ARhV96ZAL_4YKf-D6c_XfRYROgmz'
@@ -89,6 +80,44 @@ print(json.dumps(response, indent=2))
 
 class ReusableForm(Form):
     textbox = TextAreaField('text:', validators=[validators.required()])
+
+
+def g_sentiment(text):
+    client = language.LanguageServiceClient()
+
+    if isinstance(text, six.binary_type):
+        text = text.decode('utf-8')
+
+    document = types.Document(
+        content=text.encode('utf-8'),
+        type=enums.Document.Type.PLAIN_TEXT)
+
+    google_sentiment = client.analyze_sentiment(document).document_sentiment
+    #g_sent_score = google_sentiment.score
+    #g_sent_mag = google_sentiment.magnitude
+    #google_entity_sent = g_entity_sentiment_text(textbox)
+    #google_syntax = g_syntax_text(textbox)
+    #google_classify = g_classify_text(textbox)
+    return google_sentiment
+
+def g_entities(text):
+    client = language.LanguageServiceClient()
+
+    if isinstance(text, six.binary_type):
+        text = text.decode('utf-8')
+
+    document = types.Document(
+        content=text.encode('utf-8'),
+        type=enums.Document.Type.PLAIN_TEXT)
+
+    google_entities = client.analyze_entities(document).entities
+    
+    entities = []
+    for entity in google_entities:
+        entities.append(entity.name)
+
+    print(entities)
+    return entities
 
 
 def g_entity_sentiment_text(text):
@@ -175,16 +204,147 @@ def g_classify_text(text):
 
     return result
 
+def azure_sentiment(text):
+    json_tbox = { 'documents' : [
+        { 'id' : 1, 'language' : 'en', 'text' : text },
+    ] }
+    url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment'
+    azure_response  = requests.post(url, headers=azure_headers, json=json_tbox)
+    sentiment = azure_response.json()
+    sentiment = sentiment['documents'][0]['score']
+
+    return sentiment
+
+def azure_entities(text):
+    json_tbox = { 'documents' : [
+        { 'id' : 1, 'language' : 'en', 'text' : text },
+    ] }
+    url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.1-preview/entities'
+    azure_response  = requests.post(url, headers=azure_headers, json=json_tbox)   
+    entities = azure_response.json()
+
+    ents = []
+    for item in entities['documents']:
+            for i in item['entities']:
+                ents.append(i['name'])
+    
+    return ents
+
+def azure_keyphrases(text):
+    json_tbox = { 'documents' : [
+        { 'id' : 1, 'language' : 'en', 'text' : text },
+    ] }
+    url = 'https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases'
+    
+    azure_response  = requests.post(url, headers=azure_headers, json=json_tbox)    
+    azure_kps = azure_response.json()
+
+    keyPhrases = []
+    for phrase in azure_kps['documents'][0]['keyPhrases']:
+            keyPhrases.append(phrase)
+
+    return keyPhrases
+
+def aws_entities(text):
+    entities = comprehend.detect_entities(Text=text, LanguageCode='en')
+    ents = []
+    for entity in entities['Entities']:
+        ents.append(entity['Text'])
+    
+    return ents
+
+def aws_keyphrases(text):
+    keyphrases = comprehend.detect_key_phrases(Text=text, LanguageCode='en')
+    kps = []
+    for phrase in keyphrases['KeyPhrases']:
+        kps.append(phrase['Text'])
+
+    return kps
+
+def aws_syntax(text):
+    syntax = comprehend.detect_syntax(Text=text, LanguageCode='en')
+    batch = []
+    for word in syntax['SyntaxTokens']:
+        batch.append([word['Text'], word['PartOfSpeech']['Tag']])
+    return batch
+
+def IBM_sentiment(text):
+    IBM_response = naturalLanguageUnderstanding.analyze(
+        text=text,
+        features=Features(
+            sentiment=SentimentOptions()
+            )).get_result()  
+    sentiment = IBM_response['sentiment']['document']['score']
+    sentiment_label = IBM_response['sentiment']['document']['label']
+    return sentiment
+
+def IBM_entities(text):
+    IBM_response = naturalLanguageUnderstanding.analyze(
+    text=text,
+    features=Features(
+        entities=EntitiesOptions(emotion=True, sentiment=True, limit=10)
+        )).get_result()
+    ents = []
+    for entity in IBM_response['entities']:
+        print(entity)
+    return ents
+
+def IBM_keywords(text):
+    IBM_response = naturalLanguageUnderstanding.analyze(
+        text=text,
+        features=Features(
+            keywords=KeywordsOptions(emotion=True, sentiment=True,limit=10),
+            )).get_result()
+    kws = []
+    for keyword in IBM_response['keywords'][0]['text']:
+        kws.append(keyword)
+    #print("kws: ", IBM_response)
+    return kws
+
+def IBM_categories(text):
+    IBM_response = naturalLanguageUnderstanding.analyze(
+        text=text,
+        features=Features(
+            categories=CategoriesOptions()
+            )).get_result()
+    cats = []
+    for category in IBM_response['categories'][0]['label']:
+        cats.append(category)
+    #print("cats: ", IBM_response)
+    return cats
+
+def IBM_concepts(text):
+    IBM_response = naturalLanguageUnderstanding.analyze(
+        text=text,
+        features=Features(
+            entities=EntitiesOptions(emotion=True, sentiment=True, limit=10),
+            keywords=KeywordsOptions(emotion=True, sentiment=True,limit=10),
+            concepts=ConceptsOptions(limit=10),
+            semantic_roles=SemanticRolesOptions(keywords=True, entities=True),
+            relations=RelationsOptions(),
+            sentiment=SentimentOptions(),
+            categories=CategoriesOptions()
+            )).get_result()
+
 @app.route('/', methods=['GET', 'POST'])
 def hello_world():
+
     form = ReusableForm(request.form)
     print(form.errors)
+    google_dict = {}
+    azure_dict = {}
+    amazon_dict = {}
+    ibm_dict = {}
+
     if request.method == 'POST':
+        
         textbox = request.form['textbox']
+        '''
         json_tbox = { 'documents' : [
             { 'id' : 1, 'language' : 'en', 'text' : textbox },
         ] }
         print(textbox)
+        '''
     if form.validate():
 
         google_document = types.Document(
@@ -192,94 +352,62 @@ def hello_world():
             type=enums.Document.Type.PLAIN_TEXT)
 
         # Detects the sentiment of the text
-        google_sentiment = client.analyze_sentiment(document=google_document).document_sentiment
-        google_entities = client.analyze_entities(google_document).entities
+        #google_sentiment = client.analyze_sentiment(document=google_document).document_sentiment
+        #g_sent_score = google_sentiment.score
+        #g_sent_mag = google_sentiment.magnitude
+        google_sentiment = g_sentiment(textbox)
+        google_entities = g_entities(textbox)
         google_entity_sent = g_entity_sentiment_text(textbox)
         google_syntax = g_syntax_text(textbox)
         google_classify = g_classify_text(textbox)
+        
+        google_dict['sentiment'] = google_sentiment.score
+        google_dict['magnitude'] = google_sentiment.magnitude
+        google_dict['entities'] = google_entities
+        google_dict['classify'] = google_classify
 
-        azure_response  = requests.post(azure_sentiment_url, headers=headers, json=json_tbox)
-        azure_sentiments = azure_response.json()
-        azure_sentiment_score = azure_sentiments['documents'][0]['score']
-        azure_ent_resp = requests.post(azure_entities_url, headers=headers, json=json_tbox)
-        azure_entities = azure_ent_resp.json()
-        azure_keyPhrase_resp = requests.post(azure_key_phrases_url, headers=headers, json=json_tbox)
-        azure_key_phrases = azure_keyPhrase_resp.json()
+        #azure_response  = requests.post(azure_sentiment_url, headers=headers, json=json_tbox)
+        azure_sent = azure_sentiment(textbox)
+        # azure_sentiment_score = azure_sentiments['documents'][0]['score']
+        azure_dict['sentiment'] = azure_sent
+        #azure_ent_resp = requests.post(azure_entities_url, headers=headers, json=json_tbox)
+        azure_ents = azure_entities(textbox)
+        azure_dict['entities'] = azure_ents
+
+        azure_key_phrases = azure_keyphrases(textbox)
+        azure_dict['key_phrases'] = azure_key_phrases
 
         aws_sentiment = comprehend.detect_sentiment(Text=textbox, LanguageCode='en')
-        aws_entities = comprehend.detect_entities(Text=textbox, LanguageCode='en')
-        aws_key_phrases = comprehend.detect_key_phrases(Text=textbox, LanguageCode='en')
-        aws_syntax = comprehend.detect_syntax(Text=textbox, LanguageCode='en')
+        amazon_dict['pos_sentiment'] = aws_sentiment['SentimentScore']['Positive']
+        amazon_dict['neg_sentiment'] = aws_sentiment['SentimentScore']['Negative']
+        amazon_dict['neut_sentiment'] = aws_sentiment['SentimentScore']['Neutral']
 
-        print("aws entities: ", aws_entities)
+        aws_ents = aws_entities(textbox)
+        amazon_dict['entities'] = aws_ents
+        aws_key_phrases = aws_keyphrases(textbox)
+        amazon_dict['keyphrases'] = aws_key_phrases
+        aws_syn = aws_syntax(textbox)
+        amazon_dict['syntax'] = aws_syn
 
-        IBM_response = naturalLanguageUnderstanding.analyze(
-            text=textbox,
-            features=Features(
-                entities=EntitiesOptions(emotion=True, sentiment=True, limit=10),
-                keywords=KeywordsOptions(emotion=True, sentiment=True,limit=10),
-                concepts=ConceptsOptions(limit=10),
-                semantic_roles=SemanticRolesOptions(keywords=True, entities=True),
-                relations=RelationsOptions(),
-                sentiment=SentimentOptions(),
-                categories=CategoriesOptions()
-                )).get_result()
-        print(json.dumps(IBM_response, indent=2))
+        #print("aws entities: ", aws_entities)
+        '''
+        IBM_sent = IBM_sentiment(textbox)
+        IBM_ents = IBM_entities(textbox)
+        IBM_kws = IBM_keywords(textbox)
+        IBM_cats = IBM_categories(textbox)
 
-        flash('Text: ' + textbox)
-        flash('Google: Sentiment: {}, Magnitude: {}'.format(google_sentiment.score, google_sentiment.magnitude))
-        flash('Azure: Sentiment: ' + str(azure_sentiment_score))
-        flash('AWS: Positive Sentiment: ' + str(aws_sentiment['SentimentScore']['Positive']) + '\n' +
-              'Negative Sentiment: ' + str(aws_sentiment['SentimentScore']['Negative']))
-        flash('IBM Sentiment: ' + str(IBM_response['sentiment']['document']))
-        
-        for entity in google_entities:
-            flash_string = ""
-            entity_type = enums.Entity.Type(entity.type)
-            flash_string += (u'{:<16}: {}; '.format('name', entity.name))
-            flash_string += (u'{:<16}: {}; '.format('type', entity_type.name))
-            flash_string += (u'{:<16}: {}; '.format('salience', entity.salience))
-            flash_string += (u'{:<16}: {}; '.format('wikipedia_url',
-                entity.metadata.get('wikipedia_url', '-')))
-            flash_string += (u'{:<16}: {}; '.format('mid', entity.metadata.get('mid', '-')))
-            flash("Google entity: " + flash_string)
-
-        #print(azure_entities)
-        
-        for item in azure_entities['documents']:
-            for i in item['entities']:
-                #print(i)
-                #print(i['matches'])
-                if 'type' in i:
-                    #print(i['type'])
-                    flash("Azure Entity: " + i['name'] + " Type: " + i['type'])
-                else:
-                    flash("Azure Entity: " + i['name'])
-
-        phrase_str = ""
-        for phrases in azure_key_phrases['documents'][0]['keyPhrases']:
-            phrase_str += phrases + "; "
-        flash("Azure key phrases: " + phrase_str)
-
-        for word in IBM_response['keywords']:
-            flash("IBM keyword: " + str(word['text']) + "; relevance: " + str(word['relevance']))
-        
-        for ent in google_entity_sent:
-            flash("Google entity sentiment: " + ent)
-        
-        for syn in google_syntax:
-            flash("Google syntax: " + syn)
-
-        for c in google_classify:
-            flash("Google classification: " + c)
-
-        for cat in IBM_response['categories']:
-            flash("IBM category: " + str(cat['label']) + "; score: " + str(cat['score']))
-
+        ibm_dict['sentiment'] = IBM_sent
+        ibm_dict['entities'] = IBM_ents
+        ibm_dict['keywords'] = IBM_kws
+        ibm_dict['categories'] = IBM_cats
+        '''
+    
     else:
         flash('All the form fields are required')
 
-    return render_template('home.html', form=form)
+    #return render_template('home.html', form=form, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
+                           # ibm_dict=ibm_dict)
+    return render_template('main.html', form=form, google_dict=google_dict)
 
 if __name__ == "__main__":
     app.run()

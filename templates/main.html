@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Text Analytics{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<form action="" method="post">
+{{ form.csrf }}
+<div class="form-group">
+<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter you text here..." rows=10></textarea>
+</div>
+<button type="submit" class="btn btn-success">Submit</button>
+</form>
+</div>
+
+<ul class="nav nav-tabs" id="api-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="true">Google</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="azure-tab" data-toggle="tab" href="#azure" role="tab" aria-controls="azure" aria-selected="false">Azure</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="amazon-tab" data-toggle="tab" href="#amazon" role="tab" aria-controls="amazon" aria-selected="false">Amazon</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="ibm-tab" data-toggle="tab" href="#ibm" role="tab" aria-controls="ibm" aria-selected="false">IBM</a>
+    </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active" id="google" role="tabpanel" aria-labelledby="google-tab">
+        <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-pills" id="g-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="g-sent-tab" data-toggle="pill" href="#g-sent" role="tab" aria-controls="g-sent" aria-selected="true">Sentiment</a>
+                <a class="nav-link" id="g-ent-tab" data-toggle="pill" href="#g-ent" role="tab" aria-controls="g-ent" aria-selected="false">Entities</a>
+                <a class="nav-link" id="g-class-tab" data-toggle="pill" href="#g-class" role="tab" aria-controls="g-class" aria-selected="false">Classification</a>
+                <a class="nav-link" id="g-syn-tab" data-toggle="pill" href="#g-syn" role="tab" aria-controls="g-syn" aria-selected="false">Syntax</a>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="g-sent" role="tabpanel" aria-labelledby="g-sent-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sentiment</th>
+                                <th scope="col">Magnitude</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ google_dict['sentiment'] }}</td>
+                                <td>{{ google_dict['magnitude'] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="g-ent" role="tabpanel" aria-labelledby="g-ent-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Entities</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                {% with list = google_dict['entities'] %}
+                                    {% for item in list %}
+                                        <td>{{ item }}</td>
+                                    {% endfor %}
+                                {% endwith %}
+                            </tr>
+                        </tbody>
+                    </table> 
+                </div>
+                <div class="tab-pane fade" id="g-class" role="tabpanel" aria-labelledby="g-class-tab">...</div>
+                <div class="tab-pane fade" id="g-syn" role="tabpanel" aria-labelledby="g-syn-tab">...</div>
+                </div>
+            </div>
+        </div>
+  </div>
+  <div class="tab-pane" id="azure" role="tabpanel" aria-labelledby="azure-tab">...</div>
+  <div class="tab-pane" id="amazon" role="tabpanel" aria-labelledby="amazon-tab">...</div>
+  <div class="tab-pane" id="ibm" role="tabpanel" aria-labelledby="ibm-tab">...</div>
+</div>
+{% endblock %}
