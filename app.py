@@ -116,7 +116,7 @@ def g_entities(text):
     for entity in google_entities:
         entities.append(entity.name)
 
-    print(entities)
+    #print("g ents: ", entities)
     return entities
 
 
@@ -180,6 +180,7 @@ def g_syntax_text(text):
         result.append((u'{}: {}'.format(pos_tag[token.part_of_speech.tag],
                                token.text.content)))
     
+    #print("g syntax: ", result)
     return result
 
 def g_classify_text(text):
@@ -202,6 +203,7 @@ def g_classify_text(text):
         result_str += (u'{:<16}: {}'.format('confidence', category.confidence))
         result.append(result_str)
 
+    print("g categories: ", categories)
     return result
 
 def azure_sentiment(text):
@@ -213,6 +215,7 @@ def azure_sentiment(text):
     sentiment = azure_response.json()
     sentiment = sentiment['documents'][0]['score']
 
+    #print("azure sent: ", sentiment)
     return sentiment
 
 def azure_entities(text):
@@ -228,6 +231,7 @@ def azure_entities(text):
             for i in item['entities']:
                 ents.append(i['name'])
     
+    #print("azure ents: ", ents)
     return ents
 
 def azure_keyphrases(text):
@@ -243,6 +247,7 @@ def azure_keyphrases(text):
     for phrase in azure_kps['documents'][0]['keyPhrases']:
             keyPhrases.append(phrase)
 
+    #print("azure kps: ", keyPhrases)
     return keyPhrases
 
 def aws_entities(text):
@@ -251,6 +256,7 @@ def aws_entities(text):
     for entity in entities['Entities']:
         ents.append(entity['Text'])
     
+    print(entities)
     return ents
 
 def aws_keyphrases(text):
@@ -266,6 +272,7 @@ def aws_syntax(text):
     batch = []
     for word in syntax['SyntaxTokens']:
         batch.append([word['Text'], word['PartOfSpeech']['Tag']])
+
     return batch
 
 def IBM_sentiment(text):
@@ -276,6 +283,7 @@ def IBM_sentiment(text):
             )).get_result()  
     sentiment = IBM_response['sentiment']['document']['score']
     sentiment_label = IBM_response['sentiment']['document']['label']
+
     return sentiment
 
 def IBM_entities(text):
@@ -285,8 +293,12 @@ def IBM_entities(text):
         entities=EntitiesOptions(emotion=True, sentiment=True, limit=10)
         )).get_result()
     ents = []
-    for entity in IBM_response['entities']:
-        print(entity)
+    
+    #for entity in IBM_response['entities']:
+     #   ents.append(entity['text'])
+    entities = IBM_response['entities']
+
+    print("ibm ents: ", entities)
     return ents
 
 def IBM_keywords(text):
@@ -296,9 +308,9 @@ def IBM_keywords(text):
             keywords=KeywordsOptions(emotion=True, sentiment=True,limit=10),
             )).get_result()
     kws = []
-    for keyword in IBM_response['keywords'][0]['text']:
-        kws.append(keyword)
-    #print("kws: ", IBM_response)
+    for keyword in IBM_response['keywords']:
+        kws.append(keyword['text'])
+ 
     return kws
 
 def IBM_categories(text):
@@ -308,9 +320,9 @@ def IBM_categories(text):
             categories=CategoriesOptions()
             )).get_result()
     cats = []
-    for category in IBM_response['categories'][0]['label']:
-        cats.append(category)
-    #print("cats: ", IBM_response)
+    for category in IBM_response['categories']:
+        cats.append(category['label'])
+    #print("ibm cats: ", IBM_response)
     return cats
 
 def IBM_concepts(text):
@@ -365,6 +377,7 @@ def hello_world():
         google_dict['magnitude'] = google_sentiment.magnitude
         google_dict['entities'] = google_entities
         google_dict['classify'] = google_classify
+        google_dict['syntax'] = google_syntax
 
         #azure_response  = requests.post(azure_sentiment_url, headers=headers, json=json_tbox)
         azure_sent = azure_sentiment(textbox)
@@ -390,7 +403,7 @@ def hello_world():
         amazon_dict['syntax'] = aws_syn
 
         #print("aws entities: ", aws_entities)
-        '''
+        
         IBM_sent = IBM_sentiment(textbox)
         IBM_ents = IBM_entities(textbox)
         IBM_kws = IBM_keywords(textbox)
@@ -400,14 +413,15 @@ def hello_world():
         ibm_dict['entities'] = IBM_ents
         ibm_dict['keywords'] = IBM_kws
         ibm_dict['categories'] = IBM_cats
-        '''
+        
     
     else:
         flash('All the form fields are required')
 
     #return render_template('home.html', form=form, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
                            # ibm_dict=ibm_dict)
-    return render_template('main.html', form=form, google_dict=google_dict)
+    return render_template('main.html', form=form, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
+                           ibm_dict=ibm_dict)
 
 if __name__ == "__main__":
     app.run()

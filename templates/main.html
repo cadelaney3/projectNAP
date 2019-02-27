@@ -33,7 +33,7 @@
 <!-- Tab panes -->
 <div class="tab-content">
   <div class="tab-pane active" id="google" role="tabpanel" aria-labelledby="google-tab">
-        <div class="row">
+ `       <div class="row">
             <div class="col-3">
                 <div class="nav flex-column nav-pills" id="g-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="g-sent-tab" data-toggle="pill" href="#g-sent" role="tab" aria-controls="g-sent" aria-selected="true">Sentiment</a>
@@ -68,24 +68,292 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                {% with list = google_dict['entities'] %}
-                                    {% for item in list %}
+                            {% with list = google_dict['entities'] %}
+                                {% for item in list %}
+                                    <tr>
                                         <td>{{ item }}</td>
-                                    {% endfor %}
-                                {% endwith %}
-                            </tr>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
                         </tbody>
                     </table> 
                 </div>
-                <div class="tab-pane fade" id="g-class" role="tabpanel" aria-labelledby="g-class-tab">...</div>
-                <div class="tab-pane fade" id="g-syn" role="tabpanel" aria-labelledby="g-syn-tab">...</div>
+                <div class="tab-pane fade" id="g-class" role="tabpanel" aria-labelledby="g-class-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Classification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = google_dict['classify'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                <div class="tab-pane fade" id="g-syn" role="tabpanel" aria-labelledby="g-syn-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Classification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = google_dict['syntax'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
                 </div>
             </div>
         </div>
   </div>
-  <div class="tab-pane" id="azure" role="tabpanel" aria-labelledby="azure-tab">...</div>
-  <div class="tab-pane" id="amazon" role="tabpanel" aria-labelledby="amazon-tab">...</div>
-  <div class="tab-pane" id="ibm" role="tabpanel" aria-labelledby="ibm-tab">...</div>
+  <div class="tab-pane" id="azure" role="tabpanel" aria-labelledby="azure-tab">
+        <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-pills" id="az-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="az-sent-tab" data-toggle="pill" href="#az-sent" role="tab" aria-controls="az-sent" aria-selected="true">Sentiment</a>
+                <a class="nav-link" id="az-ent-tab" data-toggle="pill" href="#az-ent" role="tab" aria-controls="az-ent" aria-selected="false">Entities</a>
+                <a class="nav-link" id="az-kps-tab" data-toggle="pill" href="#az-kps" role="tab" aria-controls="az-kps" aria-selected="false">Key Phrases</a>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="az-sent" role="tabpanel" aria-labelledby="az-sent-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ azure_dict['sentiment'] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="az-ent" role="tabpanel" aria-labelledby="az-ent-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Entities</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = azure_dict['entities'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                <div class="tab-pane fade" id="az-kps" role="tabpanel" aria-labelledby="az-kps-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Key Phrases</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = azure_dict['key_phrases'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                </div>
+            </div>
+        </div>
+  </div>
+  <div class="tab-pane" id="amazon" role="tabpanel" aria-labelledby="amazon-tab">
+        <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-pills" id="aws-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="aws-sent-tab" data-toggle="pill" href="#aws-sent" role="tab" aria-controls="aws-sent" aria-selected="true">Sentiment</a>
+                <a class="nav-link" id="aws-ent-tab" data-toggle="pill" href="#aws-ent" role="tab" aria-controls="aws-ent" aria-selected="false">Entities</a>
+                <a class="nav-link" id="aws-kps-tab" data-toggle="pill" href="#aws-kps" role="tab" aria-controls="aws-kps" aria-selected="false">Key Phrases</a>
+                <a class="nav-link" id="aws-syn-tab" data-toggle="pill" href="#aws-syn" role="tab" aria-controls="aws-syn" aria-selected="false">Syntax</a>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="aws-sent" role="tabpanel" aria-labelledby="aws-sent-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Positive Sentiment</th>
+                                <th scope="col">Negative Sentiment</th>
+                                <th scope="col">Neutral Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ amazon_dict['pos_sentiment'] }}</td>
+                                <td>{{ amazon_dict['neg_sentiment'] }}</td>
+                                <td>{{ amazon_dict['neut_sentiment'] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="aws-ent" role="tabpanel" aria-labelledby="aws-ent-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Entities</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = amazon_dict['entities'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                <div class="tab-pane fade" id="aws-kps" role="tabpanel" aria-labelledby="aws-kps-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Key Phrases</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = amazon_dict['keyphrases'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                <div class="tab-pane fade" id="aws-syn" role="tabpanel" aria-labelledby="aws-syn-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Syntax</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = amazon_dict['syntax'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                </div>
+            </div>
+        </div>
+  </div>
+  <div class="tab-pane" id="ibm" role="tabpanel" aria-labelledby="ibm-tab">
+        <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-pills" id="ibm-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="ibm-sent-tab" data-toggle="pill" href="#ibm-sent" role="tab" aria-controls="ibm-sent" aria-selected="true">Sentiment</a>
+                <a class="nav-link" id="ibm-ent-tab" data-toggle="pill" href="#ibm-ent" role="tab" aria-controls="ibm-ent" aria-selected="false">Entities</a>
+                <a class="nav-link" id="ibm-kws-tab" data-toggle="pill" href="#ibm-kws" role="tab" aria-controls="ibm-kws" aria-selected="false">Classification</a>
+                <a class="nav-link" id="ibm-cat-tab" data-toggle="pill" href="#ibm-cat" role="tab" aria-controls="ibm-cat" aria-selected="false">Syntax</a>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="ibm-sent" role="tabpanel" aria-labelledby="ibm-sent-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ ibm_dict['sentiment'] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="ibm-ent" role="tabpanel" aria-labelledby="ibm-ent-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Entities</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = ibm_dict['entities'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                <div class="tab-pane fade" id="ibm-kws" role="tabpanel" aria-labelledby="ibm-kws-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Keywords</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = ibm_dict['keywords'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                <div class="tab-pane fade" id="ibm-cat" role="tabpanel" aria-labelledby="ibm-cat-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Categories</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% with list = ibm_dict['categories'] %}
+                                {% for item in list %}
+                                    <tr>
+                                        <td>{{ item }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                        </tbody>
+                    </table> 
+                </div>
+                </div>
+            </div>
+        </div>
+  </div>
 </div>
 {% endblock %}
