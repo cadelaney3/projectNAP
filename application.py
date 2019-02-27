@@ -19,8 +19,8 @@ azure_headers   = {"Ocp-Apim-Subscription-Key": subscription_key, 'Content-Type'
 application = Flask(__name__)
 #Bootstrap(app)
 
-application.config.from_object(__name__)
-application.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
+#application.config.from_object(__name__)
+#application.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 
 
 import sys
