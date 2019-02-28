@@ -28,8 +28,10 @@
     <li class="nav-item">
       <a class="nav-link" id="ibm-tab" data-toggle="tab" href="#ibm" role="tab" aria-controls="ibm" aria-selected="false">IBM</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" id="deep-ai-tab" data-toggle="tab" href="#deep-ai" role="tab" aria-controls="deep-ai" aria-selected="false">Deep AI</a>
+    </li>
 </ul>
-
 <!-- Tab panes -->
 <div class="tab-content">
   <div class="tab-pane active" id="google" role="tabpanel" aria-labelledby="google-tab">
@@ -48,8 +50,12 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Sentiment</th>
-                                <th scope="col">Magnitude</th>
+                                <th scope="col">Sentiment   
+                                    <a href="#" class="badge badge-pill badge-info" title="-1.0 (negative) to 1.0 (positive)" style="margin-left: 5px">Info</a>
+                                </th>
+                                <th scope="col">Magnitude   
+                                    <a href="#" class="badge badge-pill badge-info" title="0.0 to inifinity (strength of emotion)" style="margin-left: 5px">Info</a>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,11 +88,11 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Classification</th>
+                                <th scope="col">Categories</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% with list = google_dict['classify'] %}
+                            {% with list = google_dict['categories'] %}
                                 {% for item in list %}
                                     <tr>
                                         <td>{{ item }}</td>
@@ -100,7 +106,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Classification</th>
+                                <th scope="col">Syntax</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -133,7 +139,9 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Sentiment</th>
+                                <th scope="col">Sentiment
+                                    <a href="#" class="badge badge-pill badge-info" title="0.0 (negative) to 1.0 (positive)" style="margin-left: 5px">Info</a>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -169,7 +177,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% with list = azure_dict['key_phrases'] %}
+                            {% with list = azure_dict['keyphrases'] %}
                                 {% for item in list %}
                                     <tr>
                                         <td>{{ item }}</td>
@@ -199,9 +207,15 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Positive Sentiment</th>
-                                <th scope="col">Negative Sentiment</th>
-                                <th scope="col">Neutral Sentiment</th>
+                                <th scope="col">Positive Sentiment
+                                    <a href="#" class="badge badge-pill badge-info" title="0.0 to 1.0 (% confidence of being positive)" style="margin-left: 5px">Info</a>
+                                </th>
+                                <th scope="col">Negative Sentiment
+                                    <a href="#" class="badge badge-pill badge-info" title="0.0 to 1.0 (% confidence of being negative)" style="margin-left: 5px">Info</a>
+                                </th>
+                                <th scope="col">Neutral Sentiment
+                                    <a href="#" class="badge badge-pill badge-info" title="0.0 to 1.0 (% confidence of being neutral)" style="margin-left: 5px">Info</a>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -272,7 +286,7 @@
         </div>
   </div>
   <div class="tab-pane" id="ibm" role="tabpanel" aria-labelledby="ibm-tab">
-        <div class="row">
+       <div class="row">
             <div class="col-3">
                 <div class="nav flex-column nav-pills" id="ibm-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="ibm-sent-tab" data-toggle="pill" href="#ibm-sent" role="tab" aria-controls="ibm-sent" aria-selected="true">Sentiment</a>
@@ -287,7 +301,9 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Sentiment</th>
+                                <th scope="col">Sentiment
+                                    <a href="#" class="badge badge-pill badge-info" title="-1.0 (negative) to 1.0 (positive)" style="margin-left: 5px">Info</a>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -350,6 +366,33 @@
                             {% endwith %}
                         </tbody>
                     </table> 
+                </div>
+                </div>
+            </div>
+        </div>
+  </div>
+  <div class="tab-pane" id="deep-ai" role="tabpanel" aria-labelledby="deep-ai-tab">
+       <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-pills" id="deep-ai-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="deep-ai-sum-tab" data-toggle="pill" href="#deep-ai-sum" role="tab" aria-controls="deep-ai-sum" aria-selected="true">Summary</a>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="deep-ai-sum" role="tabpanel" aria-labelledby="deep-ai-sum-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Summary</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ deep_ai_dict['summary'] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 </div>
             </div>

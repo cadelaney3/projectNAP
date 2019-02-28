@@ -21,5 +21,8 @@
     },
     "AZURE_CREDENTIALS": {
         "AZURE_KEY": "ad9bd37163ed470cabc3d324f3d6ca5c"
+    },
+    "DEEP_AI_CREDENTIALS": {
+        "DEEP_AI_KEY": "480e49d9-ebd8-4e05-af5a-611339647a80"
     }
 }
