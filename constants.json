@@ -24,5 +24,8 @@
     },
     "DEEP_AI_CREDENTIALS": {
         "DEEP_AI_KEY": "480e49d9-ebd8-4e05-af5a-611339647a80"
+    },
+    "FLASK_SECRET_KEY": {
+        "SECRET_KEY": "7d441f27d441f27567d441f2b6176a"
     }
 }

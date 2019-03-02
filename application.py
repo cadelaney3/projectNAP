@@ -8,6 +8,9 @@ from pprint import pprint
 import sys
 import os
 import boto3
+from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor
+from threading import Thread
 # IBM imports
 import json
 from watson_developer_cloud import NaturalLanguageUnderstandingV1
@@ -20,6 +23,7 @@ import six
 from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
+
 
 with open('./constants.json') as f:
     CONSTANTS = json.load(f)
@@ -43,12 +47,12 @@ text_analytics_base_url = 'https://westus.api.cognitive.microsoft.com/text/analy
 
 azure_headers   = {"Ocp-Apim-Subscription-Key": AZURE_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json',}
 
-#DEBUG = True
+DEBUG = True
 application = Flask(__name__)
 #Bootstrap(app)
 
 application.config.from_object(__name__)
-application.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
+application.config['SECRET_KEY'] = CONSTANTS['FLASK_SECRET_KEY']['SECRET_KEY']
 
 # Instantiates a client
 client = language.LanguageServiceClient()
@@ -78,8 +82,11 @@ def g_sentiment(text):
         type=enums.Document.Type.PLAIN_TEXT)
 
     google_sentiment = client.analyze_sentiment(document).document_sentiment
+    sent = {}
+    sent['sentiment'] = google_sentiment.score
+    sent['magnitude'] = google_sentiment.magnitude
  
-    return google_sentiment
+    return sent
 
 def g_entities(text):
     client = language.LanguageServiceClient()
@@ -101,7 +108,7 @@ def g_entities(text):
     return entities
 
 
-def g_entity_sentiment_text(text):
+def g_entity_sentiment(text):
     """Detects entity sentiment in the provided text."""
     client = language.LanguageServiceClient()
 
@@ -140,7 +147,7 @@ def g_entity_sentiment_text(text):
 
     return entities
 
-def g_syntax_text(text):
+def g_syntax(text):
     """Detects syntax in the text."""
     client = language.LanguageServiceClient()
 
@@ -168,7 +175,7 @@ def g_syntax_text(text):
     #print("g syntax: ", result)
     return result
 
-def g_classify_text(text):
+def g_categories(text):
     """Classifies content categories of the provided text."""
     client = language.LanguageServiceClient()
 
@@ -188,7 +195,7 @@ def g_classify_text(text):
         result_str += (u'{:<16}: {}'.format('confidence', category.confidence))
         result.append(result_str)
 
-    print("g categories: ", categories)
+    #print("g categories: ", categories)
     return result
 
 def azure_sentiment(text):
@@ -200,8 +207,8 @@ def azure_sentiment(text):
     sentiment = azure_response.json()
     sentiment = sentiment['documents'][0]['score']
 
-    #print("azure sent: ", sentiment)
-    return sentiment
+    sent_dict = {'sentiment': sentiment}
+    return sent_dict
 
 def azure_entities(text):
     json_tbox = { 'documents' : [
@@ -235,13 +242,22 @@ def azure_keyphrases(text):
     #print("azure kps: ", keyPhrases)
     return keyPhrases
 
+def aws_sentiment(text):
+    sentiments = comprehend.detect_sentiment(Text=text, LanguageCode='en')
+    sent_dict = {}
+    sent_dict['pos_sentiment'] = sentiments['SentimentScore']['Positive']
+    sent_dict['neg_sentiment'] = sentiments['SentimentScore']['Negative']
+    sent_dict['neut_sentiment'] = sentiments['SentimentScore']['Neutral']
+    
+    return sent_dict
+
 def aws_entities(text):
     entities = comprehend.detect_entities(Text=text, LanguageCode='en')
     ents = []
     for entity in entities['Entities']:
         ents.append(entity['Text'])
     
-    print(entities)
+    #print(entities)
     return ents
 
 def aws_keyphrases(text):
@@ -269,7 +285,8 @@ def IBM_sentiment(text):
     sentiment = IBM_response['sentiment']['document']['score']
     sentiment_label = IBM_response['sentiment']['document']['label']
 
-    return sentiment
+    sent_dict = {'sentiment': sentiment}
+    return sent_dict
 
 def IBM_entities(text):
     IBM_response = naturalLanguageUnderstanding.analyze(
@@ -284,7 +301,7 @@ def IBM_entities(text):
     for e in ents:
         result.append(e['text'])
  
-    print(result)
+    #print(result)
     return result
 
 def IBM_keywords(text):
@@ -333,10 +350,10 @@ def deep_ai_sum(text):
         },
         headers={'api-key': DEEP_AI_KEY}
     )
-    print(r.json())
+    #print(r.json())
     output = r.json()
     #summary = r['output']
-    print(output['output'])
+    #print(output['output'])
     summary = output['output']
     return summary
 
@@ -345,6 +362,7 @@ def hello_world():
 
     form = ReusableForm(request.form)
     print(form.errors)
+
     google_dict = {}
     azure_dict = {}
     amazon_dict = {}
@@ -352,16 +370,13 @@ def hello_world():
     deep_ai_dict = {}
 
     dummy_dict = {}
-    dummy_dict['sentiment'] = 100.00
-    dummy_dict['magnitude'] = 100.00
+    dummy_dict['sentiment'] = {'sentiment': 100.00, 'magnitude': 100.00, 'pos_sentiment': 100.00,
+                                'neg_sentiment': 100.00, 'neut_sentiment': 100.00}
     dummy_dict['entities'] = ['dummy', 'dimmy', 'dommy', 'dammy']
     dummy_dict['keyphrases'] = ['phrase is key', 'the key is phrasing']
     dummy_dict['categories'] = ['fake', 'data']
     dummy_dict['syntax'] = [['dummy', 'NOUN']]
     dummy_dict['summary'] = "This is a dummy summary"
-    dummy_dict['pos_sentiment'] = 100.00
-    dummy_dict['neg_sentiment'] = 100.00
-    dummy_dict['neut_sentiment'] = 100.00
     dummy_dict['keywords'] = ['dummy', 'words']
 
     if request.method == 'POST':
@@ -369,58 +384,45 @@ def hello_world():
         textbox = request.form['textbox']
  
     if form.validate():
-        '''
+        
         google_document = types.Document(
             content=textbox,
             type=enums.Document.Type.PLAIN_TEXT)
 
-        google_sentiment = g_sentiment(textbox)
-        google_entities = g_entities(textbox)
-        google_entity_sent = g_entity_sentiment_text(textbox)
-        google_syntax = g_syntax_text(textbox)
-        google_classify = g_classify_text(textbox)
-        
-        google_dict['sentiment'] = google_sentiment.score
-        google_dict['magnitude'] = google_sentiment.magnitude
-        google_dict['entities'] = google_entities
-        google_dict['categories'] = google_classify
-        google_dict['syntax'] = google_syntax
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            #google_sent = executor.submit(g_sentiment, textbox).result()
+            #azure_sent = executor.submit(azure_sentiment, textbox)
+            #aws_sent = executor.submit(aws_sentiment, textbox)
+            #ibm_sent = executor.submit(IBM_sentiment, textbox)
+              
+            google_dict['sentiment'] = executor.submit(g_sentiment, textbox).result()
+            google_dict['entities'] = executor.submit(g_entities, textbox).result()
+            google_dict['categories'] = executor.submit(g_categories, textbox).result()
+            google_dict['syntax'] = executor.submit(g_syntax, textbox).result()
 
-        azure_sent = azure_sentiment(textbox)
-        azure_dict['sentiment'] = azure_sent
-        azure_ents = azure_entities(textbox)
-        azure_dict['entities'] = azure_ents
+            azure_dict['sentiment'] = executor.submit(azure_sentiment, textbox).result()
+            azure_dict['entities'] = executor.submit(azure_entities, textbox).result()
+            azure_dict['keyphrases'] = executor.submit(azure_keyphrases, textbox).result()
 
-        azure_key_phrases = azure_keyphrases(textbox)
-        azure_dict['keyphrases'] = azure_key_phrases
-
-        aws_sentiment = comprehend.detect_sentiment(Text=textbox, LanguageCode='en')
-        amazon_dict['pos_sentiment'] = aws_sentiment['SentimentScore']['Positive']
-        amazon_dict['neg_sentiment'] = aws_sentiment['SentimentScore']['Negative']
-        amazon_dict['neut_sentiment'] = aws_sentiment['SentimentScore']['Neutral']
-
-        aws_ents = aws_entities(textbox)
-        amazon_dict['entities'] = aws_ents
-        aws_key_phrases = aws_keyphrases(textbox)
-        amazon_dict['keyphrases'] = aws_key_phrases
-        aws_syn = aws_syntax(textbox)
-        amazon_dict['syntax'] = aws_syn
-        '''
-        IBM_sent = IBM_sentiment(textbox)
-        IBM_ents = IBM_entities(textbox)
-        IBM_kws = IBM_keywords(textbox)
-        IBM_cats = IBM_categories(textbox)
-        
-        ibm_dict['sentiment'] = IBM_sent
-        ibm_dict['entities'] = IBM_ents
-        ibm_dict['keywords'] = IBM_kws
-        ibm_dict['categories'] = IBM_cats
-        '''
-        deep_ai_summary = deep_ai_sum(textbox)
-        deep_ai_dict['summary'] = deep_ai_summary
-        '''
+            amazon_dict['sentiment'] = executor.submit(aws_sentiment, textbox).result()
+            amazon_dict['entities'] = executor.submit(aws_entities, textbox).result()
+            amazon_dict['keyphrases'] = executor.submit(aws_keyphrases, textbox).result()
+            amazon_dict['syntax'] = executor.submit(aws_syntax, textbox).result()
+            '''
+            IBM_sent = IBM_sentiment(textbox)
+            IBM_ents = IBM_entities(textbox)
+            IBM_kws = IBM_keywords(textbox)
+            IBM_cats = IBM_categories(textbox)
+            '''
+            ibm_dict['sentiment'] = executor.submit(IBM_sentiment, textbox).result()
+            ibm_dict['entities'] = executor.submit(IBM_entities, textbox).result()
+            ibm_dict['keywords'] = executor.submit(IBM_keywords, textbox).result()
+            ibm_dict['categories'] = executor.submit(IBM_categories, textbox).result()
+            
+            deep_ai_dict['summary'] = executor.submit(deep_ai_sum, textbox).result()
+            
     else:
-        flash('All the form fields are required')
+        flash('Enter text to be processed:')
 
     return render_template('main.html', form=form, google_dict=dummy_dict, azure_dict=dummy_dict, amazon_dict=dummy_dict,
                            ibm_dict=dummy_dict, deep_ai_dict=dummy_dict)
