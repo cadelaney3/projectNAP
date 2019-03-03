@@ -47,7 +47,7 @@ text_analytics_base_url = 'https://westus.api.cognitive.microsoft.com/text/analy
 
 azure_headers   = {"Ocp-Apim-Subscription-Key": AZURE_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json',}
 
-#DEBUG = True
+DEBUG = True
 application = Flask(__name__)
 #Bootstrap(app)
 
@@ -85,7 +85,7 @@ def g_sentiment(text):
     sent = {}
     sent['sentiment'] = google_sentiment.score
     sent['magnitude'] = google_sentiment.magnitude
- 
+    print(sent)
     return sent
 
 def g_entities(text):
@@ -357,17 +357,19 @@ def deep_ai_sum(text):
     summary = output['output']
     return summary
 
+
 @application.route('/', methods=['GET', 'POST'])
 def hello_world():
 
     form = ReusableForm(request.form)
     print(form.errors)
 
-    google_dict = {}
-    azure_dict = {}
-    amazon_dict = {}
-    ibm_dict = {}
-    deep_ai_dict = {}
+    init_dict = {'sentiment': {'sentiment': 0.0, 'magnitude': 0.0, 'neg_sentiment': 0.0,
+                 'pos_sentiment': 0.0, 'neg_sentiment': 0.0}, 'entities': [],
+                 'keyphrases': [], 'categories': [], 'syntax': [], 'summary': '',
+                 'keywords': []}
+
+
 
     dummy_dict = {}
     dummy_dict['sentiment'] = {'sentiment': 100.00, 'magnitude': 100.00, 'pos_sentiment': 100.00,
@@ -379,6 +381,12 @@ def hello_world():
     dummy_dict['summary'] = "This is a dummy summary"
     dummy_dict['keywords'] = ['dummy', 'words']
 
+    google_dict = {}
+    azure_dict = {}
+    amazon_dict = {}
+    ibm_dict = {}
+    deep_ai_dict = {}
+
     if request.method == 'POST':
         
         textbox = request.form['textbox']
@@ -389,42 +397,57 @@ def hello_world():
             content=textbox,
             type=enums.Document.Type.PLAIN_TEXT)
 
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            #google_sent = executor.submit(g_sentiment, textbox).result()
-            #azure_sent = executor.submit(azure_sentiment, textbox)
-            #aws_sent = executor.submit(aws_sentiment, textbox)
-            #ibm_sent = executor.submit(IBM_sentiment, textbox)
-              
-            google_dict['sentiment'] = executor.submit(g_sentiment, textbox).result()
-            google_dict['entities'] = executor.submit(g_entities, textbox).result()
-            google_dict['categories'] = executor.submit(g_categories, textbox).result()
-            google_dict['syntax'] = executor.submit(g_syntax, textbox).result()
+        thread_dict = {}
+        sub_dict = {}
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            google_sub_dict = {}
+            google_sub_dict['sentiment'] = executor.submit(g_sentiment, textbox).result()
+            google_sub_dict['entities'] = executor.submit(g_entities, textbox).result()
+            google_sub_dict['categories'] = executor.submit(g_categories, textbox).result()
+            google_sub_dict['syntax'] = executor.submit(g_syntax, textbox).result()
 
-            azure_dict['sentiment'] = executor.submit(azure_sentiment, textbox).result()
-            azure_dict['entities'] = executor.submit(azure_entities, textbox).result()
-            azure_dict['keyphrases'] = executor.submit(azure_keyphrases, textbox).result()
+            azure_sub_dict = {}
+            azure_sub_dict['sentiment'] = executor.submit(azure_sentiment, textbox).result()
+            azure_sub_dict['entities'] = executor.submit(azure_entities, textbox).result()
+            azure_sub_dict['keyphrases'] = executor.submit(azure_keyphrases, textbox).result()
 
-            amazon_dict['sentiment'] = executor.submit(aws_sentiment, textbox).result()
-            amazon_dict['entities'] = executor.submit(aws_entities, textbox).result()
-            amazon_dict['keyphrases'] = executor.submit(aws_keyphrases, textbox).result()
-            amazon_dict['syntax'] = executor.submit(aws_syntax, textbox).result()
-            '''
-            IBM_sent = IBM_sentiment(textbox)
-            IBM_ents = IBM_entities(textbox)
-            IBM_kws = IBM_keywords(textbox)
-            IBM_cats = IBM_categories(textbox)
-            '''
-            ibm_dict['sentiment'] = executor.submit(IBM_sentiment, textbox).result()
-            ibm_dict['entities'] = executor.submit(IBM_entities, textbox).result()
-            ibm_dict['keywords'] = executor.submit(IBM_keywords, textbox).result()
-            ibm_dict['categories'] = executor.submit(IBM_categories, textbox).result()
+            amazon_sub_dict = {}
+            amazon_sub_dict['sentiment'] = executor.submit(aws_sentiment, textbox).result()
+            amazon_sub_dict['entities'] = executor.submit(aws_entities, textbox).result()
+            amazon_sub_dict['keyphrases'] = executor.submit(aws_keyphrases, textbox).result()
+            amazon_sub_dict['syntax'] = executor.submit(aws_syntax, textbox).result()
+ 
+            ibm_sub_dict = {}
+            ibm_sub_dict['sentiment'] = executor.submit(IBM_sentiment, textbox).result()
+            ibm_sub_dict['entities'] = executor.submit(IBM_entities, textbox).result()
+            ibm_sub_dict['keywords'] = executor.submit(IBM_keywords, textbox).result()
+            ibm_sub_dict['categories'] = executor.submit(IBM_categories, textbox).result()
             
-            deep_ai_dict['summary'] = executor.submit(deep_ai_sum, textbox).result()
-            
+            deep_ai_sub_dict = {}
+            deep_ai_sub_dict['summary'] = executor.submit(deep_ai_sum, textbox).result()
+
+        thread_dict['google'] = google_sub_dict
+        thread_dict['azure'] = azure_sub_dict
+        thread_dict['amazon'] = amazon_sub_dict
+        thread_dict['ibm'] =  ibm_sub_dict
+        thread_dict['deep_ai'] = deep_ai_sub_dict
+
+        print(thread_dict)
+        google_dict = thread_dict['google']
+        azure_dict = thread_dict['azure']
+        amazon_dict = thread_dict['amazon']
+        ibm_dict = thread_dict['ibm']
+        deep_ai_dict = thread_dict['deep_ai']
+ 
     else:
         flash('Enter text to be processed:')
 
-    return render_template('main.html', form=form, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
+    if (google_dict == {} or azure_dict == {} or amazon_dict == {} or 
+        ibm_dict == {} or deep_ai_dict == {}):
+        return render_template('main.html', form=form, google_dict=init_dict, azure_dict=init_dict, amazon_dict=init_dict,
+                                ibm_dict=init_dict, deep_ai_dict=init_dict)
+    else:
+        return render_template('main.html', form=form, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
                            ibm_dict=ibm_dict, deep_ai_dict=deep_ai_dict)
 
 if __name__ == "__main__":
