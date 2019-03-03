@@ -85,7 +85,6 @@ def g_sentiment(text):
     sent = {}
     sent['sentiment'] = google_sentiment.score
     sent['magnitude'] = google_sentiment.magnitude
-    print(sent)
     return sent
 
 def g_entities(text):
@@ -102,9 +101,9 @@ def g_entities(text):
     
     entities = []
     for entity in google_entities:
-        entities.append(entity.name)
+        entities.append(entity.name.lower())
 
-    #print("g ents: ", entities)
+    entities.sort()
     return entities
 
 
@@ -132,17 +131,6 @@ def g_entity_sentiment(text):
         entity_str += 'Mentions: '
         entity_str += (u'Name: "{}"'.format(entity.name))
         name = entity.name
-        #entities[entity.name] = 
-        #for mention in entity.mentions:
-            #entity_str += (u'  Begin Offset : {}'.format(mention.text.begin_offset))
-            #entity_str += (u'  Content : {}'.format(mention.text.content))
-            #entity_str += (u'  Magnitude : {}'.format(mention.sentiment.magnitude))
-            #entity_str += (u'  Sentiment : {}'.format(mention.sentiment.score))
-            #entities[name] = mention.sentiment.score
-            #entity_str += (u'  Type : {}'.format(mention.type))
-        #entity_str += (u'Salience: {}'.format(entity.salience))
-        #entity_str += (u'Sentiment: {}\n'.format(entity.sentiment))
-        #entities.append(entity_str)
         entities[name] = entity.sentiment
 
     return entities
@@ -190,12 +178,8 @@ def g_categories(text):
 
     result = []
     for category in categories:
-        result_str = ""
-        result_str += (u'{:<16}: {}'.format('name', category.name))
-        result_str += (u'{:<16}: {}'.format('confidence', category.confidence))
-        result.append(result_str)
+        result.append(category.name)
 
-    #print("g categories: ", categories)
     return result
 
 def azure_sentiment(text):
@@ -221,9 +205,9 @@ def azure_entities(text):
     ents = []
     for item in entities['documents']:
             for i in item['entities']:
-                ents.append(i['name'])
+                ents.append(i['name'].lower())
     
-    #print("azure ents: ", ents)
+    ents.sort()
     return ents
 
 def azure_keyphrases(text):
@@ -237,9 +221,10 @@ def azure_keyphrases(text):
 
     keyPhrases = []
     for phrase in azure_kps['documents'][0]['keyPhrases']:
-            keyPhrases.append(phrase)
+            keyPhrases.append(phrase.lower())
 
     #print("azure kps: ", keyPhrases)
+    keyPhrases.sort()
     return keyPhrases
 
 def aws_sentiment(text):
@@ -255,17 +240,18 @@ def aws_entities(text):
     entities = comprehend.detect_entities(Text=text, LanguageCode='en')
     ents = []
     for entity in entities['Entities']:
-        ents.append(entity['Text'])
+        ents.append(entity['Text'].lower())
     
-    #print(entities)
+    ents.sort()
     return ents
 
 def aws_keyphrases(text):
     keyphrases = comprehend.detect_key_phrases(Text=text, LanguageCode='en')
     kps = []
     for phrase in keyphrases['KeyPhrases']:
-        kps.append(phrase['Text'])
+        kps.append(phrase['Text'].lower())
 
+    kps.sort()
     return kps
 
 def aws_syntax(text):
@@ -297,11 +283,13 @@ def IBM_entities(text):
 
     result = []
     ents = IBM_response['entities']
+    print(ents)
 
     for e in ents:
-        result.append(e['text'])
+        result.append(e['text'].lower())
  
-    #print(result)
+    result.sort()
+    print(result)
     return result
 
 def IBM_keywords(text):
@@ -312,8 +300,9 @@ def IBM_keywords(text):
             )).get_result()
     kws = []
     for keyword in IBM_response['keywords']:
-        kws.append(keyword['text'])
+        kws.append(keyword['text'].lower())
  
+    kws.sort()
     return kws
 
 def IBM_categories(text):
@@ -350,10 +339,8 @@ def deep_ai_sum(text):
         },
         headers={'api-key': DEEP_AI_KEY}
     )
-    #print(r.json())
+
     output = r.json()
-    #summary = r['output']
-    #print(output['output'])
     summary = output['output']
     return summary
 
