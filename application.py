@@ -432,7 +432,6 @@ def hello_world():
         thread_dict['ibm'] =  ibm_sub_dict
         thread_dict['deep_ai'] = deep_ai_sub_dict
 
-        print(thread_dict)
         google_dict = thread_dict['google']
         azure_dict = thread_dict['azure']
         amazon_dict = thread_dict['amazon']
