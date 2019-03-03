@@ -69,6 +69,7 @@ naturalLanguageUnderstanding = NaturalLanguageUnderstandingV1(
 
 class ReusableForm(Form):
     textbox = TextAreaField('text:', validators=[validators.required()])
+    text = ''
 
 
 def g_sentiment(text):
@@ -289,7 +290,7 @@ def IBM_entities(text):
         result.append(e['text'].lower())
  
     result.sort()
-    print(result)
+    #print(result)
     return result
 
 def IBM_keywords(text):
@@ -383,7 +384,7 @@ def hello_world():
         google_document = types.Document(
             content=textbox,
             type=enums.Document.Type.PLAIN_TEXT)
-
+        
         thread_dict = {}
         sub_dict = {}
         with ThreadPoolExecutor(max_workers=16) as executor:
@@ -424,7 +425,7 @@ def hello_world():
         amazon_dict = thread_dict['amazon']
         ibm_dict = thread_dict['ibm']
         deep_ai_dict = thread_dict['deep_ai']
- 
+        
     else:
         flash('Enter text to be processed:')
 
@@ -433,7 +434,7 @@ def hello_world():
         return render_template('main.html', form=form, google_dict=init_dict, azure_dict=init_dict, amazon_dict=init_dict,
                                 ibm_dict=init_dict, deep_ai_dict=init_dict)
     else:
-        return render_template('main.html', form=form, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
+        return render_template('main.html', form=form, textbox=textbox, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
                            ibm_dict=ibm_dict, deep_ai_dict=deep_ai_dict)
 
 if __name__ == "__main__":

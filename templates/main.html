@@ -11,9 +11,15 @@
 <form action="" method="post">
 {{ form.csrf }}
 <div class="form-group">
-<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter you text here..." rows=5></textarea>
+<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter you text here..." rows=5>{{ request.form['textbox'] }}</textarea>
 </div>
 <button type="submit" class="btn btn-success" style="margin-bottom: 30px">Submit</button>
+<input type="button" class="btn btn-primary" style="margin-bottom: 30px; margin-left: 10px" value="Clear" onclick="ClearFields();"></button>
+<script type="text/javascript">
+    function ClearFields() {
+        document.getElementById("textbox").value = "";
+    }
+</script>
 </form>
 </div>
 <div class="container">
