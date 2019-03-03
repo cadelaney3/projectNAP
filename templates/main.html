@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h2>{% block title %}Project NAP{% endblock %}</h2>
-<h4>Natural Language API Processing rev 2.0</h4>
-<h6>Copyright (c) Xpollin.com, 2019</h6>
+<h2 style="font-family:Digital, Arial, Helvetica">Project NAP</h2>
+<h6>Natural Language API Processing rev 2.0</h6>
+<h6 style="font-size:small">Copyright (c) Xpollin.com, 2019</h6>
 {% endblock %}
 
 {% block content %}
@@ -11,12 +11,12 @@
 <form action="" method="post">
 {{ form.csrf }}
 <div class="form-group">
-<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter you text here..." rows=10></textarea>
+<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter you text here..." rows=5></textarea>
 </div>
-<button type="submit" class="btn btn-success">Submit</button>
+<button type="submit" class="btn btn-success" style="margin-bottom: 30px">Submit</button>
 </form>
 </div>
-
+<div class="container">
 <ul class="nav nav-tabs" id="api-tabs" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="true">Google</a>
@@ -37,12 +37,12 @@
 <!-- Tab panes -->
 <div class="tab-content">
   <div class="tab-pane active" id="google" role="tabpanel" aria-labelledby="google-tab">
- `       <div class="row">
+        <div class="row">
             <div class="col-3">
                 <div class="nav flex-column nav-pills" id="g-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="g-sent-tab" data-toggle="pill" href="#g-sent" role="tab" aria-controls="g-sent" aria-selected="true">Sentiment</a>
                 <a class="nav-link" id="g-ent-tab" data-toggle="pill" href="#g-ent" role="tab" aria-controls="g-ent" aria-selected="false">Entities</a>
-                <a class="nav-link" id="g-class-tab" data-toggle="pill" href="#g-class" role="tab" aria-controls="g-class" aria-selected="false">Classification</a>
+                <a class="nav-link" id="g-class-tab" data-toggle="pill" href="#g-class" role="tab" aria-controls="g-class" aria-selected="false">Categories</a>
                 <a class="nav-link" id="g-syn-tab" data-toggle="pill" href="#g-syn" role="tab" aria-controls="g-syn" aria-selected="false">Syntax</a>
                 </div>
             </div>
@@ -129,7 +129,7 @@
   <div class="tab-pane" id="azure" role="tabpanel" aria-labelledby="azure-tab">
         <div class="row">
             <div class="col-3">
-                <div class="nav flex-column nav-pills" id="az-pills-tab" role="tablist" aria-orientation="vertical">
+                <div class="nav flex-md-column nav-pills" id="az-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="az-sent-tab" data-toggle="pill" href="#az-sent" role="tab" aria-controls="az-sent" aria-selected="true">Sentiment</a>
                 <a class="nav-link" id="az-ent-tab" data-toggle="pill" href="#az-ent" role="tab" aria-controls="az-ent" aria-selected="false">Entities</a>
                 <a class="nav-link" id="az-kps-tab" data-toggle="pill" href="#az-kps" role="tab" aria-controls="az-kps" aria-selected="false">Key Phrases</a>
@@ -196,7 +196,7 @@
   <div class="tab-pane" id="amazon" role="tabpanel" aria-labelledby="amazon-tab">
         <div class="row">
             <div class="col-3">
-                <div class="nav flex-column nav-pills" id="aws-pills-tab" role="tablist" aria-orientation="vertical">
+                <div class="nav flex-md-column nav-pills" id="aws-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="aws-sent-tab" data-toggle="pill" href="#aws-sent" role="tab" aria-controls="aws-sent" aria-selected="true">Sentiment</a>
                 <a class="nav-link" id="aws-ent-tab" data-toggle="pill" href="#aws-ent" role="tab" aria-controls="aws-ent" aria-selected="false">Entities</a>
                 <a class="nav-link" id="aws-kps-tab" data-toggle="pill" href="#aws-kps" role="tab" aria-controls="aws-kps" aria-selected="false">Key Phrases</a>
@@ -290,11 +290,11 @@
   <div class="tab-pane" id="ibm" role="tabpanel" aria-labelledby="ibm-tab">
        <div class="row">
             <div class="col-3">
-                <div class="nav flex-column nav-pills" id="ibm-pills-tab" role="tablist" aria-orientation="vertical">
+                <div class="nav flex-md-column nav-pills" id="ibm-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="ibm-sent-tab" data-toggle="pill" href="#ibm-sent" role="tab" aria-controls="ibm-sent" aria-selected="true">Sentiment</a>
                 <a class="nav-link" id="ibm-ent-tab" data-toggle="pill" href="#ibm-ent" role="tab" aria-controls="ibm-ent" aria-selected="false">Entities</a>
-                <a class="nav-link" id="ibm-kws-tab" data-toggle="pill" href="#ibm-kws" role="tab" aria-controls="ibm-kws" aria-selected="false">Classification</a>
-                <a class="nav-link" id="ibm-cat-tab" data-toggle="pill" href="#ibm-cat" role="tab" aria-controls="ibm-cat" aria-selected="false">Syntax</a>
+                <a class="nav-link" id="ibm-kws-tab" data-toggle="pill" href="#ibm-kws" role="tab" aria-controls="ibm-kws" aria-selected="false">Keywords</a>
+                <a class="nav-link" id="ibm-cat-tab" data-toggle="pill" href="#ibm-cat" role="tab" aria-controls="ibm-cat" aria-selected="false">Categories</a>
                 </div>
             </div>
             <div class="col-9">
@@ -376,7 +376,7 @@
   <div class="tab-pane" id="deep-ai" role="tabpanel" aria-labelledby="deep-ai-tab">
        <div class="row">
             <div class="col-3">
-                <div class="nav flex-column nav-pills" id="deep-ai-pills-tab" role="tablist" aria-orientation="vertical">
+                <div class="nav flex-md-column nav-pills" id="deep-ai-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="deep-ai-sum-tab" data-toggle="pill" href="#deep-ai-sum" role="tab" aria-controls="deep-ai-sum" aria-selected="true">Summary</a>
                 </div>
             </div>
@@ -400,5 +400,6 @@
             </div>
         </div>
   </div>
+</div>
 </div>
 {% endblock %}

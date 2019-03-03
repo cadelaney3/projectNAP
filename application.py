@@ -47,7 +47,7 @@ text_analytics_base_url = 'https://westus.api.cognitive.microsoft.com/text/analy
 
 azure_headers   = {"Ocp-Apim-Subscription-Key": AZURE_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json',}
 
-DEBUG = True
+#DEBUG = True
 application = Flask(__name__)
 #Bootstrap(app)
 
@@ -424,8 +424,8 @@ def hello_world():
     else:
         flash('Enter text to be processed:')
 
-    return render_template('main.html', form=form, google_dict=dummy_dict, azure_dict=dummy_dict, amazon_dict=dummy_dict,
-                           ibm_dict=dummy_dict, deep_ai_dict=dummy_dict)
+    return render_template('main.html', form=form, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
+                           ibm_dict=ibm_dict, deep_ai_dict=deep_ai_dict)
 
 if __name__ == "__main__":
     application.run(host='0.0.0.0')
