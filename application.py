@@ -290,7 +290,7 @@ def IBM_entities(text):
         result.append(e['text'].lower())
  
     result.sort()
-    print(result)
+    #print(result)
     return result
 
 def IBM_keywords(text):
@@ -384,7 +384,7 @@ def hello_world():
         google_document = types.Document(
             content=textbox,
             type=enums.Document.Type.PLAIN_TEXT)
-        '''
+        
         thread_dict = {}
         sub_dict = {}
         with ThreadPoolExecutor(max_workers=16) as executor:
@@ -425,7 +425,7 @@ def hello_world():
         amazon_dict = thread_dict['amazon']
         ibm_dict = thread_dict['ibm']
         deep_ai_dict = thread_dict['deep_ai']
-        '''
+        
     else:
         flash('Enter text to be processed:')
 
