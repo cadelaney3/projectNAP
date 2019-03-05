@@ -346,17 +346,15 @@ def deep_ai_sum(text):
 
 
 @application.route('/', methods=['GET', 'POST'])
-def hello_world():
+def analyze():
 
     form = ReusableForm(request.form)
     print(form.errors)
 
     init_dict = {'sentiment': {'sentiment': 0.0, 'magnitude': 0.0, 'neg_sentiment': 0.0,
-                 'pos_sentiment': 0.0, 'neg_sentiment': 0.0}, 'entities': [],
+                 'pos_sentiment': 0.0, 'neg_sentiment': 0.0, 'neut_sentiment': 0.0}, 'entities': [],
                  'keyphrases': [], 'categories': [], 'syntax': [], 'summary': '',
                  'keywords': []}
-
-
 
     dummy_dict = {}
     dummy_dict['sentiment'] = {'sentiment': 100.00, 'magnitude': 100.00, 'pos_sentiment': 100.00,
@@ -383,7 +381,7 @@ def hello_world():
         google_document = types.Document(
             content=textbox,
             type=enums.Document.Type.PLAIN_TEXT)
-
+            
         thread_dict = {}
         sub_dict = {}
         with ThreadPoolExecutor(max_workers=16) as executor:
