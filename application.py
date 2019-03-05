@@ -347,13 +347,13 @@ def deep_ai_sum(text):
 
 
 @application.route('/', methods=['GET', 'POST'])
-def hello_world():
+def analyze():
 
     form = ReusableForm(request.form)
     print(form.errors)
 
     init_dict = {'sentiment': {'sentiment': 0.0, 'magnitude': 0.0, 'neg_sentiment': 0.0,
-                 'pos_sentiment': 0.0, 'neg_sentiment': 0.0}, 'entities': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'],
+                 'pos_sentiment': 0.0, 'neg_sentiment': 0.0, 'neut_sentiment': 0.0}, 'entities': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'],
                  'keyphrases': [], 'categories': [], 'syntax': [], 'summary': '',
                  'keywords': []}
 
