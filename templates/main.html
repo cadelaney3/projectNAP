@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h2 style="font-family:Digital, Arial, Helvetica">Project NAP</h2>
+<nav class="navbar navbar-dark bg-primary" style="margin-bottom: 20px">
+    <!-- Navbar content -->
+    <div class="container">
+    <a class="navbar-brand" style="font-family: 'Orbitron', 'Courier New', Courier, monospace; font-size: 180%; color: white">Project NAP</a>
+    <div class="d-sm-flex flex-column" style="justify-content: space-between">
+        <div class="navbar-text" style="padding-bottom: 0px">Natural Language API Processing rev 2.0</div>
+        <div class="navbar-text" style="padding-top: 0px; font-size: small">Copyright (c) Xpollin.com, 2019</div>
+    </div>
+    </div>
+</nav>
+  
+<!-- <h2 style="font-family:Digital, Arial, Helvetica">Project NAP</h2>
 <h6>Natural Language API Processing rev 2.0</h6>
-<h6 style="font-size:small">Copyright (c) Xpollin.com, 2019</h6>
+<h6 style="font-size:small">Copyright (c) Xpollin.com, 2019</h6> -->
 {% endblock %}
 
 {% block content %}
@@ -11,7 +22,7 @@
 <form action="" method="post">
 {{ form.csrf }}
 <div class="form-group">
-<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter you text here..." rows=5>{{ request.form['textbox'] }}</textarea>
+<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter text to be processed..." rows=5>{{ request.form['textbox'] }}</textarea>
 </div>
 <button type="submit" class="btn btn-success" style="margin-bottom: 30px">Submit</button>
 <input type="button" class="btn btn-primary" style="margin-bottom: 30px; margin-left: 10px" value="Clear" onclick="ClearFields();"></button>
@@ -53,7 +64,7 @@
                 </div>
             </div>
             <div class="col-9">
-                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-content" id="v-pills-tabContent" style="height: 200px; overflow:auto">
                 <div class="tab-pane fade show active" id="g-sent" role="tabpanel" aria-labelledby="g-sent-tab">
                     <table class="table">
                         <thead>
@@ -74,7 +85,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="tab-pane fade" id="g-ent" role="tabpanel" aria-labelledby="g-ent-tab">
+                <div class="tab-pane fade h-100" id="g-ent" role="tabpanel" aria-labelledby="g-ent-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -92,7 +103,7 @@
                         </tbody>
                     </table> 
                 </div>
-                <div class="tab-pane fade" id="g-class" role="tabpanel" aria-labelledby="g-class-tab">
+                <div class="tab-pane fade h-100" id="g-class" role="tabpanel" aria-labelledby="g-class-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -110,7 +121,7 @@
                         </tbody>
                     </table> 
                 </div>
-                <div class="tab-pane fade" id="g-syn" role="tabpanel" aria-labelledby="g-syn-tab">
+                <div class="tab-pane fade h-100" id="g-syn" role="tabpanel" aria-labelledby="g-syn-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -142,7 +153,7 @@
                 </div>
             </div>
             <div class="col-9">
-                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-content" id="v-pills-tabContent" style="height: 200px; overflow:auto">
                 <div class="tab-pane fade show active" id="az-sent" role="tabpanel" aria-labelledby="az-sent-tab">
                     <table class="table">
                         <thead>
@@ -159,7 +170,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="tab-pane fade" id="az-ent" role="tabpanel" aria-labelledby="az-ent-tab">
+                <div class="tab-pane fade h-100" id="az-ent" role="tabpanel" aria-labelledby="az-ent-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -177,7 +188,7 @@
                         </tbody>
                     </table> 
                 </div>
-                <div class="tab-pane fade" id="az-kps" role="tabpanel" aria-labelledby="az-kps-tab">
+                <div class="tab-pane fade h-100" id="az-kps" role="tabpanel" aria-labelledby="az-kps-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -210,7 +221,7 @@
                 </div>
             </div>
             <div class="col-9">
-                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-content" id="v-pills-tabContent" style="height: 200px; overflow:auto">
                 <div class="tab-pane fade show active" id="aws-sent" role="tabpanel" aria-labelledby="aws-sent-tab">
                     <table class="table">
                         <thead>
@@ -235,7 +246,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="tab-pane fade" id="aws-ent" role="tabpanel" aria-labelledby="aws-ent-tab">
+                <div class="tab-pane fade h-100" id="aws-ent" role="tabpanel" aria-labelledby="aws-ent-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -253,7 +264,7 @@
                         </tbody>
                     </table> 
                 </div>
-                <div class="tab-pane fade" id="aws-kps" role="tabpanel" aria-labelledby="aws-kps-tab">
+                <div class="tab-pane fade h-100" id="aws-kps" role="tabpanel" aria-labelledby="aws-kps-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -271,7 +282,7 @@
                         </tbody>
                     </table> 
                 </div>
-                <div class="tab-pane fade" id="aws-syn" role="tabpanel" aria-labelledby="aws-syn-tab">
+                <div class="tab-pane fade h-100" id="aws-syn" role="tabpanel" aria-labelledby="aws-syn-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -304,7 +315,7 @@
                 </div>
             </div>
             <div class="col-9">
-                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-content" id="v-pills-tabContent" style="height: 200px; overflow:auto">
                 <div class="tab-pane fade show active" id="ibm-sent" role="tabpanel" aria-labelledby="ibm-sent-tab">
                     <table class="table">
                         <thead>
@@ -321,7 +332,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="tab-pane fade" id="ibm-ent" role="tabpanel" aria-labelledby="ibm-ent-tab">
+                <div class="tab-pane fade h-100" id="ibm-ent" role="tabpanel" aria-labelledby="ibm-ent-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -339,7 +350,7 @@
                         </tbody>
                     </table> 
                 </div>
-                <div class="tab-pane fade" id="ibm-kws" role="tabpanel" aria-labelledby="ibm-kws-tab">
+                <div class="tab-pane fade h-100" id="ibm-kws" role="tabpanel" aria-labelledby="ibm-kws-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -357,7 +368,7 @@
                         </tbody>
                     </table> 
                 </div>
-                <div class="tab-pane fade" id="ibm-cat" role="tabpanel" aria-labelledby="ibm-cat-tab">
+                <div class="tab-pane fade h-100" id="ibm-cat" role="tabpanel" aria-labelledby="ibm-cat-tab">
                     <table class="table">
                         <thead>
                             <tr>
@@ -387,8 +398,8 @@
                 </div>
             </div>
             <div class="col-9">
-                <div class="tab-content" id="v-pills-tabContent">
-                <div class="tab-pane fade show active" id="deep-ai-sum" role="tabpanel" aria-labelledby="deep-ai-sum-tab">
+                <div class="tab-content" id="v-pills-tabContent" style="height: 200px; overflow:auto">
+                <div class="tab-pane fade show active h-100" id="deep-ai-sum" role="tabpanel" aria-labelledby="deep-ai-sum-tab">
                     <table class="table">
                         <thead>
                             <tr>

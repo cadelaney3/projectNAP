@@ -353,7 +353,7 @@ def hello_world():
     print(form.errors)
 
     init_dict = {'sentiment': {'sentiment': 0.0, 'magnitude': 0.0, 'neg_sentiment': 0.0,
-                 'pos_sentiment': 0.0, 'neg_sentiment': 0.0}, 'entities': [],
+                 'pos_sentiment': 0.0, 'neg_sentiment': 0.0}, 'entities': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'],
                  'keyphrases': [], 'categories': [], 'syntax': [], 'summary': '',
                  'keywords': []}
 
@@ -384,7 +384,7 @@ def hello_world():
         google_document = types.Document(
             content=textbox,
             type=enums.Document.Type.PLAIN_TEXT)
-        
+        ''' 
         thread_dict = {}
         sub_dict = {}
         with ThreadPoolExecutor(max_workers=16) as executor:
@@ -425,7 +425,7 @@ def hello_world():
         amazon_dict = thread_dict['amazon']
         ibm_dict = thread_dict['ibm']
         deep_ai_dict = thread_dict['deep_ai']
-        
+        '''
     else:
         flash('Enter text to be processed:')
 
