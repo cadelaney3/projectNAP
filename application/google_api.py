@@ -3,9 +3,7 @@ import os
 from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
-
-#credential_path = "../google_creds.json"
-#os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
+from google.cloud import speech
 
 
 class Google_Cloud:
