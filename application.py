@@ -19,6 +19,7 @@ from watson_developer_cloud.natural_language_understanding_v1 \
 
 from application.google_api import Google_Cloud
 from application.google_api import Google_ST
+from application.google_api import MicStream
 from application.azure_api import Azure_API
 from application.aws_api import AWS_API
 from application.ibm_api import IBM_API
@@ -29,8 +30,12 @@ with open('./constants.json') as f:
 
 audio = os.path.join(
     os.path.dirname(__file__),
-    '.', 'meeting_15sec.wav'
+    './audio', 'meeting_15sec.wav'
 )
+
+RATE = 16000
+CHUNK = int(RATE / 10)  # 100ms
+
 
 AZURE_KEY = CONSTANTS['AZURE_CREDENTIALS']['AZURE_KEY']
 IBM_APIKEY = CONSTANTS['IBM_CREDENTIALS']['IBM_APIKEY']
@@ -71,8 +76,8 @@ def analyze():
 
     form = ReusableForm(request.form)
     print(form.errors)
-    google_speech = Google_ST(audio)
-    google_speech.transcribe()
+    google_speech = Google_ST(audio, RATE, CHUNK)
+    google_speech.file_transcribe()
 
     init_dict = {'sentiment': {'sentiment': 0.0, 'magnitude': 0.0, 'neg_sentiment': 0.0,
                  'pos_sentiment': 0.0, 'neg_sentiment': 0.0, 'neut_sentiment': 0.0}, 'entities': [],
