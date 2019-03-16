@@ -1,9 +1,12 @@
 import six
 import os
+import io
 from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 from google.cloud import speech
+from google.cloud.speech import enums
+from google.cloud.speech import types
 
 
 class Google_Cloud:
@@ -81,3 +84,23 @@ class Google_Cloud:
 
         return result
     
+class Google_ST:
+    def __init__(self, file):
+        self.file = file
+        self.client = speech.SpeechClient()
+
+    def transcribe(self):
+        with io.open(self.file, 'rb') as audio_file:
+            content = audio_file.read()
+            audio = types.RecognitionAudio(content=content)
+        
+        config = types.RecognitionConfig(
+            encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+            #sample_rate_hertz=44100,
+            language_code='en-US'
+        )
+        
+        response = self.client.recognize(config, audio)
+
+        for result in response.results:
+            print('Transcript: {}'.format(result.alternatives[0].transcript))

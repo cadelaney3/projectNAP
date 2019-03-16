@@ -18,6 +18,7 @@ from watson_developer_cloud.natural_language_understanding_v1 \
     import Features, EntitiesOptions, KeywordsOptions, ConceptsOptions, EmotionOptions, RelationsOptions, SemanticRolesOptions, SentimentOptions, CategoriesOptions
 
 from application.google_api import Google_Cloud
+from application.google_api import Google_ST
 from application.azure_api import Azure_API
 from application.aws_api import AWS_API
 from application.ibm_api import IBM_API
@@ -26,6 +27,10 @@ from application.deep_ai_api import Deep_AI_API
 with open('./constants.json') as f:
     CONSTANTS = json.load(f)
 
+audio = os.path.join(
+    os.path.dirname(__file__),
+    '.', 'meeting_15sec.wav'
+)
 
 AZURE_KEY = CONSTANTS['AZURE_CREDENTIALS']['AZURE_KEY']
 IBM_APIKEY = CONSTANTS['IBM_CREDENTIALS']['IBM_APIKEY']
@@ -66,7 +71,8 @@ def analyze():
 
     form = ReusableForm(request.form)
     print(form.errors)
-
+    google_speech = Google_ST(audio)
+    google_speech.transcribe()
 
     init_dict = {'sentiment': {'sentiment': 0.0, 'magnitude': 0.0, 'neg_sentiment': 0.0,
                  'pos_sentiment': 0.0, 'neg_sentiment': 0.0, 'neut_sentiment': 0.0}, 'entities': [],
@@ -94,7 +100,7 @@ def analyze():
         textbox = request.form['textbox']
  
     if form.validate():
-
+        '''
         google = Google_Cloud(textbox)
         azure = Azure_API(azure_headers, textbox)
         aws = AWS_API(comprehend, textbox)
@@ -137,7 +143,7 @@ def analyze():
         amazon_dict = thread_dict['amazon']
         ibm_dict = thread_dict['ibm']
         deep_ai_dict = thread_dict['deep_ai']
- 
+        '''
     else:
         flash('Enter text to be processed:')
 
