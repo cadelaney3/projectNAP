@@ -20,6 +20,10 @@
 {% block content %}
 <div class="container">
 <form action="" method="post">
+  <div class="speech">
+    <input type="text" name="q" id="transcript" placeholder="Speak" />
+    <img onclick="startDictation()" src="//i.imgur.com/cHidSVu.gif" />
+  </div>
 {{ form.csrf }}
 <div class="form-group">
 <textarea class="form-control" id="textbox" name="textbox" placeholder="Enter text to be processed..." rows=5>{{ request.form['textbox'] }}</textarea>
@@ -30,13 +34,40 @@
     function ClearFields() {
         document.getElementById("textbox").value = "";
     }
+    function startDictation() {
+
+        if (window.hasOwnProperty('webkitSpeechRecognition')) {
+
+            var recognition = new webkitSpeechRecognition();
+
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.lang = "en-US";
+            recognition.start();
+
+            recognition.onresult = function(e) {
+                document.getElementById('transcript').value
+                                        = e.results[0][0].transcript;
+                recognition.stop();
+                document.getElementById('labnol').submit();
+            };
+            recognition.onerror = function(e) {
+            recognition.stop();
+            }
+
+        }
+    }
 </script>
 </form>
 </div>
 <div class="container">
 <ul class="nav nav-tabs" id="api-tabs" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="true">Google</a>
+        <a class="nav-link active" id="keywords-tab" data-toggle="tab" href="#keywords" role="tab" aria-controls="keywords" aria-selected="true">Keywords</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="false">Google</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" id="azure-tab" data-toggle="tab" href="#azure" role="tab" aria-controls="azure" aria-selected="false">Azure</a>
@@ -53,7 +84,25 @@
 </ul>
 <!-- Tab panes -->
 <div class="tab-content">
-  <div class="tab-pane active" id="google" role="tabpanel" aria-labelledby="google-tab">
+    <div class="tab-pane active" id="keywords" role="tabpanel" aria-labelledby="keywords-tab" style="height: 200px; overflow:auto">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Keywords</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% with list = keywords_dict['keywords'] %}
+                    {% for item in list %}
+                        <tr>
+                            <td>{{ item }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endwith %}
+            </tbody>
+        </table>
+    </div>
+  <div class="tab-pane" id="google" role="tabpanel" aria-labelledby="google-tab">
         <div class="row">
             <div class="col-3">
                 <div class="nav flex-md-column nav-pills" id="g-pills-tab" role="tablist" aria-orientation="vertical">

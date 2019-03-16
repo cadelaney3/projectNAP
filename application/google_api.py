@@ -128,7 +128,7 @@ class Google_ST:
 class MicStream(object):
     def __init__(self, rate, chunk):
         self._rate = rate
-        self._chunck = chunk
+        self._chunk = chunk
         self._buff = queue.Queue()
         self.closed = True
 

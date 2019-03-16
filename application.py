@@ -77,7 +77,9 @@ def analyze():
     form = ReusableForm(request.form)
     print(form.errors)
     google_speech = Google_ST(audio, RATE, CHUNK)
-    google_speech.file_transcribe()
+    #google_speech.file_transcribe()
+    #google_speech.transcribe_mic()
+
 
     init_dict = {'sentiment': {'sentiment': 0.0, 'magnitude': 0.0, 'neg_sentiment': 0.0,
                  'pos_sentiment': 0.0, 'neg_sentiment': 0.0, 'neut_sentiment': 0.0}, 'entities': [],
@@ -99,6 +101,7 @@ def analyze():
     amazon_dict = {}
     ibm_dict = {}
     deep_ai_dict = {}
+    keywords_dict = {}
 
     if request.method == 'POST':
         
@@ -125,15 +128,22 @@ def analyze():
             azure_sub_dict['sentiment'] = executor.submit(azure.sentiment).result()
             azure_sub_dict['entities'] = executor.submit(azure.entities).result()
             azure_sub_dict['keyphrases'] = executor.submit(azure.keyphrases).result()
+            keywords_dict['keywords'] = azure_sub_dict['keyphrases']
 
             amazon_sub_dict = {}
             amazon_sub_dict['sentiment'] = executor.submit(aws.sentiment).result()
             amazon_sub_dict['entities'] = executor.submit(aws.entities).result()
             amazon_sub_dict['keyphrases'] = executor.submit(aws.keyphrases).result()
+            for i in range(0, len(amazon_sub_dict['keyphrases'])):
+                if amazon_sub_dict['keyphrases'][i] not in keywords['keywords']:
+                    keywords['keywords'].append(amazon_sub_dict['keyphrases'][i])
             amazon_sub_dict['syntax'] = executor.submit(aws.syntax).result()
  
             ibm_sub_dict = executor.submit(ibm.concepts).result()
-  
+            for i in range(0, len(ibm_sub_dict['keywords'])):
+                if ibm_sub_dict['keywords'][i] not in keywords['keywords']:
+                    keywords['keywords'].append(ibm_sub_dict['keywords'][i])
+            
             deep_ai_sub_dict = {}
             deep_ai_sub_dict['summary'] = executor.submit(deep_ai.summary).result()
 
@@ -155,10 +165,10 @@ def analyze():
     if (google_dict == {} or azure_dict == {} or amazon_dict == {} or 
         ibm_dict == {} or deep_ai_dict == {}):
         return render_template('main.html', form=form, google_dict=init_dict, azure_dict=init_dict, amazon_dict=init_dict,
-                                ibm_dict=init_dict, deep_ai_dict=init_dict)
+                                ibm_dict=init_dict, deep_ai_dict=init_dict, keywords_dict=init_dict)
     else:
         return render_template('main.html', form=form, google_dict=google_dict, azure_dict=azure_dict, amazon_dict=amazon_dict,
-                           ibm_dict=ibm_dict, deep_ai_dict=deep_ai_dict)
+                           ibm_dict=ibm_dict, deep_ai_dict=deep_ai_dict, keywords_dict=keywords_dict)
 
 if __name__ == "__main__":
     application.run(host='0.0.0.0')
