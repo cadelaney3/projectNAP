@@ -1,12 +1,18 @@
-from flask import Flask, render_template, flash, request
-from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
+from flask import Flask, url_for, redirect, render_template, flash, request, session
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired
+from werkzeug.utils import secure_filename
+from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField, FileField
 from wtforms.widgets import TextArea
 from flask_bootstrap import Bootstrap
 import requests
 import json
 import sys
 import os
+import io
+from io import BytesIO
 import boto3
+import wave
 from multiprocessing import Pool
 from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
@@ -71,13 +77,47 @@ naturalLanguageUnderstanding = NaturalLanguageUnderstandingV1(
 class ReusableForm(Form):
     textbox = TextAreaField('text:', validators=[validators.required()])
 
+class AudioForm(Form):
+    audioFile = FileField('audio')
+
+@application.route('/uploader', methods=['GET', 'POST'])
+def upload_file():
+
+    init_dict = {'sentiment': {'sentiment': 0.0, 'magnitude': 0.0, 'neg_sentiment': 0.0,
+                 'pos_sentiment': 0.0, 'neg_sentiment': 0.0, 'neut_sentiment': 0.0}, 'entities': [],
+                 'keyphrases': [], 'categories': [], 'syntax': [], 'summary': '',
+                 'keywords': []}
+    #form = ReusableForm(request.form)
+
+    if request.method == 'POST':
+        if 'file' in request.files:
+            f = request.files['file']
+            f.save(secure_filename(f.filename))
+            audio = os.path.join(
+                os.path.dirname(__file__),
+                '.', f.filename
+            )
+            google_speech = Google_ST(audio, 44100, CHUNK)
+            transcription = google_speech.transcribe_file()
+            #form.textbox.data = transcription
+            #return render_template('main.html', form=form, google_dict=init_dict, azure_dict=init_dict, amazon_dict=init_dict,
+                                #ibm_dict=init_dict, deep_ai_dict=init_dict, keywords_dict=init_dict)
+            session['transcription'] = transcription
+            return redirect(url_for('analyze'))
+        
+
 @application.route('/', methods=['GET', 'POST'])
 def analyze():
 
+    transcription = ''
+    if 'transcription' in session.keys():
+        transcription = session['transcription']
+
     form = ReusableForm(request.form)
+    form.textbox.data = transcription
     print(form.errors)
-    google_speech = Google_ST(audio, RATE, CHUNK)
-    #google_speech.file_transcribe()
+    #google_speech = Google_ST(audio, 44100, CHUNK)
+    #google_speech.transcribe_file()
     #google_speech.transcribe_mic()
 
 
@@ -104,11 +144,21 @@ def analyze():
     keywords_dict = {}
 
     if request.method == 'POST':
+        # if 'file' in request.files:
+        #     file = request.files['file']
+        #     print(file.filename)
+        #     print(type(file.read()))
+        #     data = file.read()
+        #     google_speech = Google_ST(file, 44100, CHUNK)
+        #     #google_speech.printFields()
+        #     google_speech.transcribe_file()
         
-        textbox = request.form['textbox']
+        if form.textbox.data:
+            print("in textbox")
+            textbox = request.form['textbox']
  
     if form.validate():
-        '''
+        
         google = Google_Cloud(textbox)
         azure = Azure_API(azure_headers, textbox)
         aws = AWS_API(comprehend, textbox)
@@ -158,7 +208,7 @@ def analyze():
         amazon_dict = thread_dict['amazon']
         ibm_dict = thread_dict['ibm']
         deep_ai_dict = thread_dict['deep_ai']
-        '''
+        
     else:
         flash('Enter text to be processed:')
 
@@ -171,4 +221,4 @@ def analyze():
                            ibm_dict=ibm_dict, deep_ai_dict=deep_ai_dict, keywords_dict=keywords_dict)
 
 if __name__ == "__main__":
-    application.run(host='0.0.0.0')
+    application.run(host='0.0.0.0', threaded=True)

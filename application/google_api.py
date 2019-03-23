@@ -92,7 +92,7 @@ class Google_Cloud:
     
 class Google_ST:
     def __init__(self, file, rate, chunk):
-        self.file = file
+        self.audio_file = file
         self.client = speech.SpeechClient()
         self.rate = rate
         self.chunk = chunk
@@ -106,15 +106,24 @@ class Google_ST:
             interim_results=True
         )
 
+    def printFields(self):
+        print(type(self.audio_file))
+        print(type(self.audio_file.read()))
+
     def transcribe_file(self):
-        with io.open(self.file, 'rb') as audio_file:
+        with io.open(self.audio_file, 'rb') as audio_file:
+            #content = self.audio_file.read()
             content = audio_file.read()
+            print(type(content))
             audio = types.RecognitionAudio(content=content)
         
-        response = self.client.recognize(config, audio)
-
+        response = self.client.recognize(self.config, audio)
+        result_str = ''
         for result in response.results:
+            result_str += result.alternatives[0].transcript
             print('Transcript: {}'.format(result.alternatives[0].transcript))
+
+        return result_str
     
     def transcribe_mic(self):
         with MicStream(self.rate, self.chunk) as stream:

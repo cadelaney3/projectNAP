@@ -19,14 +19,14 @@
 
 {% block content %}
 <div class="container">
+    <form action="/uploader" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" />
+        <input type="submit" class="btn btn-primary" />
+    </form>
 <form action="" method="post">
-  <div class="speech">
-    <input type="text" name="q" id="transcript" placeholder="Speak" />
-    <img onclick="startDictation()" src="//i.imgur.com/cHidSVu.gif" />
-  </div>
 {{ form.csrf }}
 <div class="form-group">
-<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter text to be processed..." rows=5>{{ request.form['textbox'] }}</textarea>
+<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter text to be processed..." rows=5>{{ form.textbox.data }}</textarea>
 </div>
 <button type="submit" class="btn btn-success" style="margin-bottom: 30px">Submit</button>
 <input type="button" class="btn btn-primary" style="margin-bottom: 30px; margin-left: 10px" value="Clear" onclick="ClearFields();"></button>
