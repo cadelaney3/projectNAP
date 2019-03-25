@@ -254,7 +254,7 @@ def index():
                 RATE = 1600
 
             google_speech = Google_ST(audio, RATE, CHUNK)
-            transcription = google_speech.transcribe_file(uri)
+            transcription = google_speech.transcribe_file()
             form.textbox.data = transcription
         
     if form.validate() and form.textbox.data: 
