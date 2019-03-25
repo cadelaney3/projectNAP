@@ -4,7 +4,7 @@ class Deep_AI_API:
     def __init__(self, headers, text):
         self.headers = headers
         self.text = text
-
+ 
     def summary(self):
         r = requests.post(
             "https://api.deepai.org/api/summarization",
@@ -15,5 +15,11 @@ class Deep_AI_API:
         )
 
         output = r.json()
-        deep_ai_summary = output['output']
+        print(output)
+        deep_ai_summary = ''
+        if 'output' in output:
+            deep_ai_summary = output['output']
+        else:
+            deep_ai_summary = 'No summary available'
         return deep_ai_summary
+

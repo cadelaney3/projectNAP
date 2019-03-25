@@ -11,13 +11,14 @@ from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
 from google.cloud import speech
-from google.cloud.speech import enums
-from google.cloud.speech import types
+from google.cloud.speech import enums as enums2
+from google.cloud.speech import types as types2
 
 
 class Google_Cloud:
 
     def __init__(self, text):
+        print(text)
         self.client = language.LanguageServiceClient()
 
         if isinstance(text, six.binary_type):
@@ -96,12 +97,12 @@ class Google_ST:
         self.client = speech.SpeechClient()
         self.rate = rate
         self.chunk = chunk
-        self.config = types.RecognitionConfig(
-            encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+        self.config = types2.RecognitionConfig(
+            encoding=enums2.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=rate,
             language_code='en-US'
         )
-        self.streaming_config = types.StreamingRecognitionConfig(
+        self.streaming_config = types2.StreamingRecognitionConfig(
             config=self.config,
             interim_results=True
         )
@@ -112,10 +113,9 @@ class Google_ST:
 
     def transcribe_file(self):
         with io.open(self.audio_file, 'rb') as audio_file:
-            #content = self.audio_file.read()
             content = audio_file.read()
-            print(type(content))
-            audio = types.RecognitionAudio(content=content)
+            #print(type(content))
+            audio = types2.RecognitionAudio(content=content)
         
         response = self.client.recognize(self.config, audio)
         result_str = ''
@@ -124,6 +124,22 @@ class Google_ST:
             print('Transcript: {}'.format(result.alternatives[0].transcript))
 
         return result_str
+    
+    def transcribe_long_file(self, uri):
+       # with io.open(self.audio_file, 'rb') as audio_file:
+        #    content = audio_file.read()
+        audio = types2.RecognitionAudio(uri=uri)
+        
+        operation = self.client.long_running_recognize(self.config, audio)
+        print('Waiting for operation to complete')
+        response = operation.result(timeout=1000)
+
+        result_str = ''
+        for result in response.results:
+            result_str += result.alternatives[0].transcript
+        
+        return result_str
+
     
     def transcribe_mic(self):
         with MicStream(self.rate, self.chunk) as stream:
