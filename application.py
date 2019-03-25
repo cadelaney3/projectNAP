@@ -12,7 +12,6 @@ import os
 import io
 from io import BytesIO
 import boto3
-import wave
 from multiprocessing import Pool
 from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
@@ -276,4 +275,4 @@ def index():
                            ibm_dict=analyze_dict['ibm'], deep_ai_dict=analyze_dict['deep_ai'], keywords_dict=analyze_dict['keywords'])
 
 if __name__ == "__main__":
-    application.run(host='0.0.0.0', threaded=True)
+    application.run(host='0.0.0.0')
