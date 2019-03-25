@@ -140,11 +140,3 @@ class Google_ST:
         return result_str
 
     
-    def transcribe_mic(self):
-        with MicStream(self.rate, self.chunk) as stream:
-            audio_generator = stream.generator()
-            requests = (types.StreamingRecognizeRequest(audio_content=content)
-                        for content in audio_generator)
-
-            responses = self.client.streaming_recognize(self.streaming_config, requests)
-            stream.listen_print_loop(responses)

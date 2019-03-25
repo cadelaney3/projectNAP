@@ -1,10 +1,7 @@
 from flask import Flask, url_for, redirect, render_template, flash, request, session
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired
 from werkzeug.utils import secure_filename
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField, FileField
 from wtforms.widgets import TextArea
-from flask_bootstrap import Bootstrap
 import requests
 import json
 import sys
@@ -24,7 +21,6 @@ from watson_developer_cloud.natural_language_understanding_v1 \
 
 from application.google_api import Google_Cloud
 from application.google_api import Google_ST
-from application.google_api import MicStream
 from application.azure_api import Azure_API
 from application.aws_api import AWS_API
 from application.ibm_api import IBM_API
@@ -258,7 +254,7 @@ def index():
                 RATE = 1600
 
             google_speech = Google_ST(audio, RATE, CHUNK)
-            transcription = google_speech.transcribe_long_file(uri)
+            transcription = google_speech.transcribe_file(uri)
             form.textbox.data = transcription
         
     if form.validate() and form.textbox.data: 
