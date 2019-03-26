@@ -271,4 +271,5 @@ def index():
                            ibm_dict=analyze_dict['ibm'], deep_ai_dict=analyze_dict['deep_ai'], keywords_dict=analyze_dict['keywords'])
 
 if __name__ == "__main__":
+    application.jinja_env.cache = {}
     application.run(host='0.0.0.0')
