@@ -33,11 +33,6 @@ import six
 with open('./constants.json') as f:
     CONSTANTS = json.load(f)
 
-audio = os.path.join(
-    os.path.dirname(__file__),
-    './audio', 'meeting_15sec-old1.wav'
-)
-
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
 
@@ -98,23 +93,25 @@ def list_blobs(bucket_name):
     for blob in blobs:
         print(blob.name)
 
-def upload_audio_file(file, filename, file_stream, content_type):
-    if not file:
+def upload_audio_file(filename, content, content_type):
+    if not filename:
         return None
 
+    audio_filename = filename.replace(" ", "")
     storage_client = storage.Client()
     bucket = storage_client.bucket('project-nap-bucket')
     blob = bucket.blob(filename)
     blob.upload_from_string(
-        file_stream,
+        content,
         content_type=content_type
     )
     url = blob.public_url
     if isinstance(url, six.binary_type):
         url = url.decode('utf-8')
     
-    print("Uploaded file %s as %s" % (file.filename, url))
-    return url    
+    print("Uploaded file %s as %s" % (filename, url))
+    gcs_uri = 'gs://project-nap-bucket/' + audio_filename
+    return gcs_uri    
 
 
 def analyze(textbox):
@@ -218,7 +215,6 @@ def analyze(textbox):
 
     results_dict = {'google': google_dict, 'azure': azure_dict, 'amazon': amazon_dict, 'ibm': ibm_dict, 'deep_ai': deep_ai_dict, 'keywords': keywords_dict}
     return results_dict
-        
 
 @application.route('/', methods=['GET', 'POST'])
 def index():
@@ -240,26 +236,27 @@ def index():
         
         if 'file' in request.files:
             f = request.files['file']
-            f.save(secure_filename(f.filename))
-            audio = os.path.join(
-                os.path.dirname(__file__),
-                '.', f.filename
-            )
-            upload_blob('project-nap-bucket', audio, 'audio-blob')
-            url = upload_audio_file(f, f.filename, f.read(), f.content_type)
-            uri = "gs://project-nap-bucket/audio-blob"
+            f2 = request.files.get('file')
+            content = f2.read()
+            filename = secure_filename(f2.filename)
+            f2.save(secure_filename(f2.filename))
+            gcs_uri = upload_audio_file(filename, content, f2.content_type)
+            print(gcs_uri)
+            print(f2.content_length)
+
             if f.filename.lower().endswith(('.wav', '.flac', '.mp3', '.m4a', '.mp4')):
                 RATE = 44100
             else:
                 RATE = 1600
 
-            google_speech = Google_ST(audio, RATE, CHUNK)
-            transcription = google_speech.transcribe_file()
+            google_speech = Google_ST(gcs_uri, RATE, CHUNK)
+            transcription = google_speech.transcribe_file(gcs_uri)
             form.textbox.data = transcription
         
     if form.validate() and form.textbox.data: 
         textbox = form.textbox.data
         try:
+            #print()
             analyze_dict = analyze(textbox)
         except Exception:
             print("Error: could not analyze text")

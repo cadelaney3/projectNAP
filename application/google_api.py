@@ -110,11 +110,11 @@ class Google_ST:
         print(type(self.audio_file))
         print(type(self.audio_file.read()))
 
-    def transcribe_file(self):
-        with io.open(self.audio_file, 'rb') as audio_file:
-            content = audio_file.read()
+    def transcribe_file(self, uri):
+        #with io.open(self.audio_file, 'rb') as audio_file:
+         #   content = audio_file.read()
             #print(type(content))
-            audio = types2.RecognitionAudio(content=content)
+        audio = types2.RecognitionAudio(uri=uri)
         
         response = self.client.recognize(self.config, audio)
         result_str = ''
