@@ -12,6 +12,7 @@ from google.cloud.language import types
 from google.cloud import speech
 from google.cloud.speech import enums as enums2
 from google.cloud.speech import types as types2
+from google.cloud import speech_v1p1beta1 as speech2
 
 
 class Google_Cloud:
@@ -93,18 +94,9 @@ class Google_Cloud:
 class Google_ST:
     def __init__(self, file, rate, chunk):
         self.audio_file = file
-        self.client = speech.SpeechClient()
+        self.client = speech2.SpeechClient()
         self.rate = rate
         self.chunk = chunk
-        self.config = types2.RecognitionConfig(
-            encoding=enums2.RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=rate,
-            language_code='en-US'
-        )
-        self.streaming_config = types2.StreamingRecognitionConfig(
-            config=self.config,
-            interim_results=True
-        )
 
     def printFields(self):
         print(type(self.audio_file))
@@ -114,24 +106,63 @@ class Google_ST:
         #with io.open(self.audio_file, 'rb') as audio_file:
          #   content = audio_file.read()
             #print(type(content))
-        audio = types2.RecognitionAudio(uri=uri)
-        
-        response = self.client.recognize(self.config, audio)
-        result_str = ''
-        for result in response.results:
-            result_str += result.alternatives[0].transcript
-            print('Transcript: {}'.format(result.alternatives[0].transcript))
+        #audio = types2.RecognitionAudio(uri=uri)
+        try:
+            config = speech2.types.RecognitionConfig(
+                encoding=speech2.enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                sample_rate_hertz=self.rate,
+                language_code='en-US',
+                audio_channel_count=2,
+                enable_separate_recognition_per_channel=True
+            )
+            audio = speech2.types.RecognitionAudio(uri=uri)
+            
+            response = self.client.recognize(config, audio)
+            result_str = ''
+            for result in response.results:
+                result_str += result.alternatives[0].transcript
+                print('Transcript: {}'.format(result.alternatives[0].transcript))
 
-        return result_str
+            return result_str
+
+        except Exception as e:
+            try:
+                config = speech2.types.RecognitionConfig(
+                    encoding=speech2.enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                    sample_rate_hertz=self.rate,
+                    language_code='en-US',
+                )
+                audio = speech2.types.RecognitionAudio(uri=uri)
+                
+                response = self.client.recognize(config, audio)
+                result_str = ''
+                for result in response.results:
+                    result_str += result.alternatives[0].transcript
+                    print('Transcript: {}'.format(result.alternatives[0].transcript))
+
+                return result_str
+
+            except Exception as e2:
+                try:
+                    result_str = self.transcribe_long_file(uri)
+                    return result_str
+                except Exception as e3:
+                    print(e3)
+
     
     def transcribe_long_file(self, uri):
        # with io.open(self.audio_file, 'rb') as audio_file:
         #    content = audio_file.read()
-        audio = types2.RecognitionAudio(uri=uri)
+        config = speech2.types.RecognitionConfig(
+                    encoding=speech2.enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                    sample_rate_hertz=self.rate,
+                    language_code='en-US',
+                )
+        audio = speech2.types.RecognitionAudio(uri=uri)
         
-        operation = self.client.long_running_recognize(self.config, audio)
+        operation = self.client.long_running_recognize(config, audio)
         print('Waiting for operation to complete')
-        response = operation.result(timeout=1000)
+        response = operation.result(timeout=90)
 
         result_str = ''
         for result in response.results:

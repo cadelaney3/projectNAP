@@ -19,44 +19,20 @@
 
 {% block content %}
 <div class="container">
-    <form action="" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" id="file" />
-        <input type="submit" class="btn btn-primary" />
+    <form action="" id="fileform" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="file" form="fileform" />
+        <input type="submit" form="fileform" class="btn btn-primary" value="Submit" />
     </form>
-<form action="" method="post">
+<form action="" id="textform" method="post">
 {{ form.csrf }}
 <div class="form-group">
 <textarea class="form-control" id="textbox" name="textbox" placeholder="Enter text to be processed..." rows=5>{{ form.textbox.data }}</textarea>
 </div>
-<button type="submit" class="btn btn-success" style="margin-bottom: 30px">Submit</button>
+<button type="submit" form="textform" class="btn btn-success" style="margin-bottom: 30px">Submit</button>
 <input type="button" class="btn btn-primary" style="margin-bottom: 30px; margin-left: 10px" value="Clear" onclick="ClearFields();"></button>
 <script type="text/javascript">
     function ClearFields() {
         document.getElementById("textbox").value = "";
-    }
-    function startDictation() {
-
-        if (window.hasOwnProperty('webkitSpeechRecognition')) {
-
-            var recognition = new webkitSpeechRecognition();
-
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.lang = "en-US";
-            recognition.start();
-
-            recognition.onresult = function(e) {
-                document.getElementById('transcript').value
-                                        = e.results[0][0].transcript;
-                recognition.stop();
-                document.getElementById('labnol').submit();
-            };
-            recognition.onerror = function(e) {
-            recognition.stop();
-            }
-
-        }
     }
 </script>
 </form>

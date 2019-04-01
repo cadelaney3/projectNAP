@@ -1,5 +1,6 @@
-from flask import Flask, url_for, redirect, render_template, flash, request, session
+from flask import Flask, url_for, redirect, render_template, flash, request, session, jsonify
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField, FileField
 from wtforms.widgets import TextArea
 import requests
@@ -29,6 +30,8 @@ from application.deep_ai_api import Deep_AI_API
 from google.cloud import storage
 import six
 
+import tempfile
+import wave
 
 with open('./constants.json') as f:
     CONSTANTS = json.load(f)
@@ -52,13 +55,13 @@ os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 azure_headers = {"Ocp-Apim-Subscription-Key": AZURE_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json',}
 deep_ai_headers = {'api-key': DEEP_AI_KEY}
-print(deep_ai_headers)
 
-DEBUG = True
+DEBUG = False
 application = Flask(__name__)
 
 application.config.from_object(__name__)
 application.config['SECRET_KEY'] = CONSTANTS['FLASK_SECRET_KEY']['SECRET_KEY']
+application.config['MAX_CONTENT_LENGTH'] = 16*1024*1024
 
 comprehend = boto3.client(service_name='comprehend', aws_access_key_id=AWS_ACCESS_KEY,
     aws_secret_access_key=AWS_SECRET_KEY, region_name='us-west-2')
@@ -74,24 +77,6 @@ class ReusableForm(Form):
 
 class AudioForm(Form):
     audioFile = FileField('audio')
-
-def upload_blob(bucket_name, source_file_name, destination_blob_name):
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename(source_file_name)
-
-    print('File {} uploaded to {}.'. format(
-        source_file_name,
-        destination_blob_name
-    ))
-
-def list_blobs(bucket_name):
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    blobs = bucket.list_blobs()
-    for blob in blobs:
-        print(blob.name)
 
 def upload_audio_file(filename, content, content_type):
     if not filename:
@@ -113,6 +98,15 @@ def upload_audio_file(filename, content, content_type):
     gcs_uri = 'gs://project-nap-bucket/' + audio_filename
     return gcs_uri    
 
+def download_blob(source_blob_name, destination_file_name):
+    """Downloads a blob from the bucket."""
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket('project-nap-bucket')
+    blob = bucket.blob(source_blob_name)
+
+    blob.download_to_file(destination_file_name)
+    #content = blob.download_as_string(storage_client)
+    #return content
 
 def analyze(textbox):
     results_dict = {}
@@ -216,11 +210,13 @@ def analyze(textbox):
     results_dict = {'google': google_dict, 'azure': azure_dict, 'amazon': amazon_dict, 'ibm': ibm_dict, 'deep_ai': deep_ai_dict, 'keywords': keywords_dict}
     return results_dict
 
+
 @application.route('/', methods=['GET', 'POST'])
 def index():
     
     form = ReusableForm(request.form)
     textbox = ''
+    transcription = ''
 
     print(form.errors)
 
@@ -235,31 +231,47 @@ def index():
     if request.method == 'POST':
         
         if 'file' in request.files:
-            f = request.files['file']
-            f2 = request.files.get('file')
-            content = f2.read()
-            filename = secure_filename(f2.filename)
-            f2.save(secure_filename(f2.filename))
-            gcs_uri = upload_audio_file(filename, content, f2.content_type)
-            print(gcs_uri)
-            print(f2.content_length)
+            f = request.files.get('file')
+            content = f.read()
+            #f.save(secure_filename(f.filename))
+
+            filename = secure_filename(f.filename)
+            filename.replace(" ", '')
+            f.seek(0)
+            print(filename)
+
+            gcs_uri = upload_audio_file(filename, content, f.content_type)
+
+            # fd, path = tempfile.mkstemp()
+            # try:
+            #     with os.fdopen(fd, 'w+b') as temp:
+            #         download_blob(filename, temp)
+            #         #temp.write(c)
+            #         w = wave.open(temp, 'rb')
+            #         print(w.getnchannels())
+            # finally:
+            #     os.remove(path)
 
             if f.filename.lower().endswith(('.wav', '.flac', '.mp3', '.m4a', '.mp4')):
                 RATE = 44100
             else:
                 RATE = 1600
 
-            google_speech = Google_ST(gcs_uri, RATE, CHUNK)
-            transcription = google_speech.transcribe_file(gcs_uri)
-            form.textbox.data = transcription
-        
-    if form.validate() and form.textbox.data: 
-        textbox = form.textbox.data
-        try:
-            #print()
-            analyze_dict = analyze(textbox)
-        except Exception:
-            print("Error: could not analyze text")
+            try:
+                google_speech = Google_ST(gcs_uri, RATE, CHUNK)
+                transcription = google_speech.transcribe_file(gcs_uri)
+                form.textbox.data = transcription
+            except Exception as e:
+                print(e)
+
+        else:
+            if form.textbox.data: 
+                textbox = form.textbox.data
+                try:
+                    print()
+                    analyze_dict = analyze(textbox)
+                except Exception:
+                    print("Error: could not analyze text")
     
     else:
         flash('Enter text to be processed:')
@@ -268,5 +280,5 @@ def index():
                            ibm_dict=analyze_dict['ibm'], deep_ai_dict=analyze_dict['deep_ai'], keywords_dict=analyze_dict['keywords'])
 
 if __name__ == "__main__":
-    application.jinja_env.cache = {}
+    #application.jinja_env.cache = {}
     application.run(host='0.0.0.0')
