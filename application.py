@@ -20,12 +20,12 @@ from watson_developer_cloud import NaturalLanguageUnderstandingV1
 from watson_developer_cloud.natural_language_understanding_v1 \
     import Features, EntitiesOptions, KeywordsOptions, ConceptsOptions, EmotionOptions, RelationsOptions, SemanticRolesOptions, SentimentOptions, CategoriesOptions
 
-from application.google_api import Google_Cloud
-from application.google_api import Google_ST
-from application.azure_api import Azure_API
-from application.aws_api import AWS_API
-from application.ibm_api import IBM_API
-from application.deep_ai_api import Deep_AI_API
+from app.google_api import Google_Cloud
+from app.google_api import Google_ST
+from app.azure_api import Azure_API
+from app.aws_api import AWS_API
+from app.ibm_api import IBM_API
+from app.deep_ai_api import Deep_AI_API
 
 from google.cloud import storage
 import six
