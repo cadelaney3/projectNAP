@@ -19,12 +19,16 @@ from watson_developer_cloud.natural_language_understanding_v1 import Features #,
 from watson_developer_cloud import NaturalLanguageUnderstandingV1
 from watson_developer_cloud.natural_language_understanding_v1 \
     import Features, EntitiesOptions, KeywordsOptions, ConceptsOptions, EmotionOptions, RelationsOptions, SemanticRolesOptions, SentimentOptions, CategoriesOptions
+from watson_developer_cloud import SpeechToTextV1
+from watson_developer_cloud.websocket import RecognizeCallback, AudioSource
+import json
 
 from app.google_api import Google_Cloud
 from app.google_api import Google_ST
 from app.azure_api import Azure_API
 from app.aws_api import AWS_API
 from app.ibm_api import IBM_API
+from app.ibm_api import MyRecognizeCallback
 from app.deep_ai_api import Deep_AI_API
 
 from google.cloud import storage
@@ -56,7 +60,7 @@ os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 azure_headers = {"Ocp-Apim-Subscription-Key": AZURE_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json',}
 deep_ai_headers = {'api-key': DEEP_AI_KEY}
 
-DEBUG = False
+DEBUG = True
 application = Flask(__name__)
 
 application.config.from_object(__name__)
@@ -241,6 +245,7 @@ def index():
             print(filename)
 
             gcs_uri = upload_audio_file(filename, content, f.content_type)
+            print(gcs_uri)
 
             # fd, path = tempfile.mkstemp()
             # try:
@@ -258,9 +263,15 @@ def index():
                 RATE = 1600
 
             try:
-                google_speech = Google_ST(gcs_uri, RATE, CHUNK)
-                transcription = google_speech.transcribe_file(gcs_uri)
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    google_speech = Google_ST(gcs_uri, RATE, CHUNK)
+                    transcription = executor.submit(google_speech.transcribe_file, gcs_uri).result()
+                    #transcription = google_speech.transcribe_file(gcs_uri)
                 form.textbox.data = transcription
+
+                #myRecognizeCallback = MyRecognizeCallback()
+                #TODO
+
             except Exception as e:
                 print(e)
 

@@ -9,7 +9,7 @@ import io
 from google.cloud import language
 from google.cloud.language import enums
 from google.cloud.language import types
-from google.cloud import speech
+from google.cloud import speech as speech1
 from google.cloud.speech import enums as enums2
 from google.cloud.speech import types as types2
 from google.cloud import speech_v1p1beta1 as speech2
@@ -94,7 +94,7 @@ class Google_Cloud:
 class Google_ST:
     def __init__(self, file, rate, chunk):
         self.audio_file = file
-        self.client = speech2.SpeechClient()
+        self.client = speech1.SpeechClient()
         self.rate = rate
         self.chunk = chunk
 
@@ -107,32 +107,17 @@ class Google_ST:
          #   content = audio_file.read()
             #print(type(content))
         #audio = types2.RecognitionAudio(uri=uri)
-        try:
-            config = speech2.types.RecognitionConfig(
-                encoding=speech2.enums.RecognitionConfig.AudioEncoding.LINEAR16,
-                sample_rate_hertz=self.rate,
-                language_code='en-US',
-                audio_channel_count=2,
-                enable_separate_recognition_per_channel=True
-            )
-            audio = speech2.types.RecognitionAudio(uri=uri)
-            
-            response = self.client.recognize(config, audio)
-            result_str = ''
-            for result in response.results:
-                result_str += result.alternatives[0].transcript
-                print('Transcript: {}'.format(result.alternatives[0].transcript))
 
-            return result_str
-
-        except Exception as e:
+        if uri.endswith('.wav'):
             try:
-                config = speech2.types.RecognitionConfig(
-                    encoding=speech2.enums.RecognitionConfig.AudioEncoding.LINEAR16,
-                    sample_rate_hertz=self.rate,
+                config = speech1.types.RecognitionConfig(
+                    encoding=speech1.enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                    #sample_rate_hertz=self.rate,
                     language_code='en-US',
+                    audio_channel_count=2,
+                    enable_separate_recognition_per_channel=True
                 )
-                audio = speech2.types.RecognitionAudio(uri=uri)
+                audio = speech1.types.RecognitionAudio(uri=uri)
                 
                 response = self.client.recognize(config, audio)
                 result_str = ''
@@ -142,23 +127,62 @@ class Google_ST:
 
                 return result_str
 
-            except Exception as e2:
+            except Exception as e:
                 try:
-                    result_str = self.transcribe_long_file(uri)
+                    config = speech1.types.RecognitionConfig(
+                        encoding=speech1.enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                        #sample_rate_hertz=self.rate,
+                        language_code='en-US',
+                    )
+                    audio = speech1.types.RecognitionAudio(uri=uri)
+                    
+                    response = self.client.recognize(config, audio)
+                    result_str = ''
+                    for result in response.results:
+                        result_str += result.alternatives[0].transcript
+                        print('Transcript: {}'.format(result.alternatives[0].transcript))
+
                     return result_str
-                except Exception as e3:
-                    print(e3)
+
+                except Exception as e2:
+                    try:
+                        result_str = self.transcribe_long_file(uri)
+                        return result_str
+                    except Exception as e3:
+                        print(e3)
+
+        elif uri.endswith('.flac'):
+            try:
+                config = speech1.types.RecognitionConfig(
+                    encoding=speech1.enums.RecognitionConfig.AudioEncoding.FLAC,
+                    #sample_rate_hertz=self.rate,
+                    language_code='en-US',
+                )
+                audio = speech1.types.RecognitionAudio(uri=uri)
+                
+                response = self.client.recognize(config, audio)
+                result_str = ''
+                for result in response.results:
+                    result_str += result.alternatives[0].transcript
+                    print('Transcript: {}'.format(result.alternatives[0].transcript))
+
+                return result_str   
+            except Exception as e:
+                print(e)
+
+        else:
+            return "Please use .wav or .flac audio files"
 
     
     def transcribe_long_file(self, uri):
        # with io.open(self.audio_file, 'rb') as audio_file:
         #    content = audio_file.read()
-        config = speech2.types.RecognitionConfig(
+        config = speech1.types.RecognitionConfig(
                     encoding=speech2.enums.RecognitionConfig.AudioEncoding.LINEAR16,
-                    sample_rate_hertz=self.rate,
+                    #sample_rate_hertz=self.rate,
                     language_code='en-US',
                 )
-        audio = speech2.types.RecognitionAudio(uri=uri)
+        audio = speech1.types.RecognitionAudio(uri=uri)
         
         operation = self.client.long_running_recognize(config, audio)
         print('Waiting for operation to complete')
