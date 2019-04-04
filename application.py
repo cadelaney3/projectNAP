@@ -247,15 +247,7 @@ def index():
             gcs_uri = upload_audio_file(filename, content, f.content_type)
             print(gcs_uri)
 
-            # fd, path = tempfile.mkstemp()
-            # try:
-            #     with os.fdopen(fd, 'w+b') as temp:
-            #         download_blob(filename, temp)
-            #         #temp.write(c)
-            #         w = wave.open(temp, 'rb')
-            #         print(w.getnchannels())
-            # finally:
-            #     os.remove(path)
+
 
             if f.filename.lower().endswith(('.wav', '.flac', '.mp3', '.m4a', '.mp4')):
                 RATE = 44100

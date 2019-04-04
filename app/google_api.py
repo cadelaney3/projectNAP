@@ -175,8 +175,6 @@ class Google_ST:
 
     
     def transcribe_long_file(self, uri):
-       # with io.open(self.audio_file, 'rb') as audio_file:
-        #    content = audio_file.read()
         config = speech1.types.RecognitionConfig(
                     encoding=speech2.enums.RecognitionConfig.AudioEncoding.LINEAR16,
                     #sample_rate_hertz=self.rate,
