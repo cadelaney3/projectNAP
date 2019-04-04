@@ -12,19 +12,20 @@
     </div>
 </nav>
   
-<!-- <h2 style="font-family:Digital, Arial, Helvetica">Project NAP</h2>
-<h6>Natural Language API Processing rev 2.0</h6>
-<h6 style="font-size:small">Copyright (c) Xpollin.com, 2019</h6> -->
 {% endblock %}
 
 {% block content %}
 <div class="container">
-<form action="" method="post">
+    <form action="" id="fileform" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="file" form="fileform" />
+        <input type="submit" form="fileform" class="btn btn-primary" value="Submit" />
+    </form>
+<form action="" id="textform" method="post">
 {{ form.csrf }}
 <div class="form-group">
-<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter text to be processed..." rows=5>{{ request.form['textbox'] }}</textarea>
+<textarea class="form-control" id="textbox" name="textbox" placeholder="Enter text to be processed..." rows=5>{{ form.textbox.data }}</textarea>
 </div>
-<button type="submit" class="btn btn-success" style="margin-bottom: 30px">Submit</button>
+<button type="submit" form="textform" class="btn btn-success" style="margin-bottom: 30px">Submit</button>
 <input type="button" class="btn btn-primary" style="margin-bottom: 30px; margin-left: 10px" value="Clear" onclick="ClearFields();"></button>
 <script type="text/javascript">
     function ClearFields() {
@@ -36,7 +37,10 @@
 <div class="container">
 <ul class="nav nav-tabs" id="api-tabs" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="true">Google</a>
+        <a class="nav-link active" id="keywords-tab" data-toggle="tab" href="#keywords" role="tab" aria-controls="keywords" aria-selected="true">Keywords</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="false">Google</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" id="azure-tab" data-toggle="tab" href="#azure" role="tab" aria-controls="azure" aria-selected="false">Azure</a>
@@ -53,7 +57,25 @@
 </ul>
 <!-- Tab panes -->
 <div class="tab-content">
-  <div class="tab-pane active" id="google" role="tabpanel" aria-labelledby="google-tab">
+    <div class="tab-pane active" id="keywords" role="tabpanel" aria-labelledby="keywords-tab" style="height: 200px; overflow:auto">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Keywords</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% with list = keywords_dict['keywords'] %}
+                    {% for item in list %}
+                        <tr>
+                            <td>{{ item }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endwith %}
+            </tbody>
+        </table>
+    </div>
+  <div class="tab-pane" id="google" role="tabpanel" aria-labelledby="google-tab">
         <div class="row">
             <div class="col-3">
                 <div class="nav flex-md-column nav-pills" id="g-pills-tab" role="tablist" aria-orientation="vertical">
