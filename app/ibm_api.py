@@ -8,6 +8,9 @@ from watson_developer_cloud.websocket import RecognizeCallback, AudioSource
 from os.path import join, dirname
 import json
 
+default_url = "https://stream.watsonplatform.net/speech-to-text/api"
+web_socket = "wss://stream.watsonplatform.net/speech-to-text/api/v1/recognize"
+
 class IBM_API:
     def __init__(self, headers, text):
         self.naturalLanguageUnderstanding = headers

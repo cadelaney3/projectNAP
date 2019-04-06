@@ -22,6 +22,7 @@ from watson_developer_cloud.natural_language_understanding_v1 \
 from watson_developer_cloud import SpeechToTextV1
 from watson_developer_cloud.websocket import RecognizeCallback, AudioSource
 import json
+from os.path import join, dirname
 
 from app.google_api import Google_Cloud
 from app.google_api import Google_ST
@@ -74,6 +75,14 @@ naturalLanguageUnderstanding = NaturalLanguageUnderstandingV1(
     version='2018-11-16',
     iam_apikey=IBM_APIKEY,
     url=IBM_URL
+)
+
+default_url = "https://stream.watsonplatform.net/speech-to-text/api"
+web_socket = "wss://stream.watsonplatform.net/speech-to-text/api/v1/recognize"
+
+speech_to_text = SpeechToTextV1(
+    iam_apikey="k1lHYY6zTpsvSBAhWNbIDRu9rRRVOwGmbCQvr_vWrsxQ",
+    url=default_url
 )
 
 class ReusableForm(Form):
@@ -255,14 +264,23 @@ def index():
                 RATE = 1600
 
             try:
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    google_speech = Google_ST(gcs_uri, RATE, CHUNK)
-                    transcription = executor.submit(google_speech.transcribe_file, gcs_uri).result()
-                    #transcription = google_speech.transcribe_file(gcs_uri)
-                form.textbox.data = transcription
+                # with ThreadPoolExecutor(max_workers=2) as executor:
+                #     google_speech = Google_ST(gcs_uri, RATE, CHUNK)
+                #     transcription = executor.submit(google_speech.transcribe_file, gcs_uri).result()
+                #     #transcription = google_speech.transcribe_file(gcs_uri)
+                # form.textbox.data = transcription
 
-                #myRecognizeCallback = MyRecognizeCallback()
-                #TODO
+                myRecognizeCallback = MyRecognizeCallback()
+                with open(join(dirname(__file__), './audio/.', 'meeting_15sec.wav'), 'rb') as audio_file:
+                    audio_source = AudioSource(audio_file)
+                    response = speech_to_text.recognize_using_websocket(
+                        audio=audio_source,
+                        content_type='audio/wav',
+                        recognize_callback=myRecognizeCallback,
+                        model='en-US_BroadbandModel',
+                        max_alternatives=2
+                    )
+                    form.textbox.data = response['results']
 
             except Exception as e:
                 print(e)
@@ -272,7 +290,7 @@ def index():
                 textbox = form.textbox.data
                 try:
                     print()
-                    analyze_dict = analyze(textbox)
+                    #analyze_dict = analyze(textbox)
                 except Exception:
                     print("Error: could not analyze text")
     
