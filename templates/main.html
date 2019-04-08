@@ -40,6 +40,9 @@
         <a class="nav-link active" id="keywords-tab" data-toggle="tab" href="#keywords" role="tab" aria-controls="keywords" aria-selected="true">Keywords</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" id="transcribe-tab" data-toggle="tab" href="#transcribe" role="tab" aria-controls="transcribe" aria-selected="false">Transcriptions</a>
+    </li>
+    <li class="nav-item">
       <a class="nav-link" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="false">Google</a>
     </li>
     <li class="nav-item">
@@ -74,6 +77,26 @@
                 {% endwith %}
             </tbody>
         </table>
+    </div>
+    <div class="tab-pane" id="transcribe" role="tabpanel" aria-labelledby="transcribe-tab">
+        <div class="row">
+            <div class="col-3">
+              <div class="nav flex-column nav-pills" id="trans-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="g-trans-tab" data-toggle="pill" href="#g-trans" role="tab" aria-controls="g-trans" aria-selected="true">Google</a>
+                <a class="nav-link" id="ibm-trans-tab" data-toggle="pill" href="#ibm-trans" role="tab" aria-controls="ibm-trans" aria-selected="false">IBM</a>
+                <a class="nav-link" id="aws-trans-tab" data-toggle="pill" href="#aws-trans" role="tab" aria-controls="aws-trans" aria-selected="false">Amazon</a>
+                <a class="nav-link" id="azure-trans-tab" data-toggle="pill" href="#azure-trans" role="tab" aria-controls="azure-trans" aria-selected="false">Azure</a>
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="tab-content" id="transcribe-tabContent">
+                <div class="tab-pane fade show active" id="g-trans" role="tabpanel" aria-labelledby="g-trans-tab">{{ trans_dict['google'] }}</div>
+                <div class="tab-pane fade" id="ibm-trans" role="tabpanel" aria-labelledby="ibm-trans-tab">{{ trans_dict['ibm'] }}</div>
+                <div class="tab-pane fade" id="aws-trans" role="tabpanel" aria-labelledby="aws-trans-tab">{{ trans_dict['amazon'] }}</div>
+                <div class="tab-pane fade" id="azure-trans" role="tabpanel" aria-labelledby="azure-trans-tab">...</div>
+              </div>
+            </div>
+          </div>
     </div>
   <div class="tab-pane" id="google" role="tabpanel" aria-labelledby="google-tab">
         <div class="row">

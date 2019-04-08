@@ -62,3 +62,18 @@ class MyRecognizeCallback(RecognizeCallback):
 
     def on_inactivity_timeout(self, error):
         print('Inactivity timeout: {}'.format(error))
+
+class IBM_transcribe:
+    def __init__(self, speech_to_text):
+        self.speech_to_text = speech_to_text
+
+    def transcribe(self, audio, content_type):
+        try:
+            response = self.speech_to_text.recognize(
+                audio=audio,
+                content_type='audio/' + content_type,
+                max_alternatives=2
+            ).get_result()
+            return response['results'][0]['alternatives'][0]['transcript']
+        except Exception as e:
+            print(e)

@@ -28,15 +28,18 @@ from app.google_api import Google_Cloud
 from app.google_api import Google_ST
 from app.azure_api import Azure_API
 from app.aws_api import AWS_API
+from app.aws_api import AWS_transcribe
 from app.ibm_api import IBM_API
 from app.ibm_api import MyRecognizeCallback
 from app.deep_ai_api import Deep_AI_API
+from app.ibm_api import IBM_transcribe
 
 from google.cloud import storage
 import six
 
 import tempfile
 import wave
+import time
 
 with open('./constants.json') as f:
     CONSTANTS = json.load(f)
@@ -70,6 +73,13 @@ application.config['MAX_CONTENT_LENGTH'] = 16*1024*1024
 
 comprehend = boto3.client(service_name='comprehend', aws_access_key_id=AWS_ACCESS_KEY,
     aws_secret_access_key=AWS_SECRET_KEY, region_name='us-west-2')
+
+
+s3 = boto3.resource(service_name='s3', aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY, region_name='us-west-2')
+s3_bucket = 'project-nap-bucket'
+transcribe_client = boto3.client('transcribe', aws_access_key_id=AWS_ACCESS_KEY,
+            aws_secret_access_key=AWS_SECRET_KEY, region_name='us-west-2')
 
 naturalLanguageUnderstanding = NaturalLanguageUnderstandingV1(
     version='2018-11-16',
@@ -229,7 +239,8 @@ def index():
     
     form = ReusableForm(request.form)
     textbox = ''
-    transcription = ''
+
+    transcription_dict = {'google': '', 'ibm': '', 'amazon': '', 'azure': ''}
 
     print(form.errors)
 
@@ -246,6 +257,7 @@ def index():
         if 'file' in request.files:
             f = request.files.get('file')
             content = f.read()
+            print(f.content_type)
             #f.save(secure_filename(f.filename))
 
             filename = secure_filename(f.filename)
@@ -256,7 +268,7 @@ def index():
             gcs_uri = upload_audio_file(filename, content, f.content_type)
             print(gcs_uri)
 
-
+            s3.Bucket(s3_bucket).put_object(Key=filename, Body=content)
 
             if f.filename.lower().endswith(('.wav', '.flac', '.mp3', '.m4a', '.mp4')):
                 RATE = 44100
@@ -264,24 +276,18 @@ def index():
                 RATE = 1600
 
             try:
-                # with ThreadPoolExecutor(max_workers=2) as executor:
-                #     google_speech = Google_ST(gcs_uri, RATE, CHUNK)
-                #     transcription = executor.submit(google_speech.transcribe_file, gcs_uri).result()
-                #     #transcription = google_speech.transcribe_file(gcs_uri)
-                # form.textbox.data = transcription
+                
+                with ThreadPoolExecutor(max_workers=3) as executor:
+                    google_speech = Google_ST(gcs_uri, RATE, CHUNK)
+                    transcription_dict['google'] = executor.submit(google_speech.transcribe_file, gcs_uri).result()
+                    ibm_transcribe = IBM_transcribe(speech_to_text)
+                    transcription_dict['ibm'] = executor.submit(ibm_transcribe.transcribe, content, 'wav').result()
+                    aws_transcribe = AWS_transcribe(transcribe_client)
+                    transcription_dict['amazon'] = executor.submit(aws_transcribe.transcribe_audio, s3_bucket, filename).result()
 
-                myRecognizeCallback = MyRecognizeCallback()
-                with open(join(dirname(__file__), './audio/.', 'meeting_15sec.wav'), 'rb') as audio_file:
-                    audio_source = AudioSource(audio_file)
-                    response = speech_to_text.recognize_using_websocket(
-                        audio=audio_source,
-                        content_type='audio/wav',
-                        recognize_callback=myRecognizeCallback,
-                        model='en-US_BroadbandModel',
-                        max_alternatives=2
-                    )
-                    form.textbox.data = response['results']
+                form.textbox.data = transcription_dict['google']
 
+ 
             except Exception as e:
                 print(e)
 
@@ -298,7 +304,8 @@ def index():
         flash('Enter text to be processed:')
 
     return render_template('main.html', form=form, google_dict=analyze_dict['google'], azure_dict=analyze_dict['azure'], amazon_dict=analyze_dict['amazon'],
-                           ibm_dict=analyze_dict['ibm'], deep_ai_dict=analyze_dict['deep_ai'], keywords_dict=analyze_dict['keywords'])
+                           ibm_dict=analyze_dict['ibm'], deep_ai_dict=analyze_dict['deep_ai'], keywords_dict=analyze_dict['keywords'],
+                           trans_dict=transcription_dict)
 
 if __name__ == "__main__":
     #application.jinja_env.cache = {}

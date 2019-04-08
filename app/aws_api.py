@@ -1,4 +1,7 @@
 import boto3
+import uuid
+import time
+import requests
 
 class AWS_API:
     def __init__(self, client, text):
@@ -39,3 +42,47 @@ class AWS_API:
             batch.append([word['Text'], word['PartOfSpeech']['Tag']])
 
         return batch
+
+class AWS_transcribe:
+    def __init__(self, client):
+        self.transcribe = client
+
+    def transcribe_audio(self, bucket_name, filename):
+        try:
+            audio_format = ''
+            if filename.endswith('wav'):
+                audio_format = 'wav'
+            elif filename.endswith('mp3'):
+                audio_format = 'mp3'
+            elif filename.endswith('mp4'):
+                audio_format = 'mp4'
+            elif filename.endswith('flac'):
+                audio_format = 'flac'
+            else:
+                return "Error: Amazon Transcribe does not work with this audio type."
+            
+            job_name = str(uuid.uuid4())
+            job_uri = "https://s3-us-west-2.amazonaws.com/" + bucket_name + "/" + filename
+            self.transcribe.start_transcription_job(
+                TranscriptionJobName=job_name,
+                Media={'MediaFileUri': job_uri},
+                MediaFormat=audio_format,
+                LanguageCode='en-US'
+            )
+            while True:
+                status = self.transcribe.get_transcription_job(TranscriptionJobName=job_name)
+                if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
+                    break
+                print("Not ready yet...")
+                time.sleep(5)
+
+            url = status['TranscriptionJob']['Transcript']['TranscriptFileUri']
+
+            temp = requests.get(url)
+            data = temp.json()
+            transcription = data['results']['transcripts'][0]['transcript']
+            return transcription
+
+        except Exception as e:
+            print(e)
+            return "Error: Amazon Transcribe could not transcribe this file"
