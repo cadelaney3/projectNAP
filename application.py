@@ -282,8 +282,8 @@ def index():
                     transcription_dict['google'] = executor.submit(google_speech.transcribe_file, gcs_uri).result()
                     ibm_transcribe = IBM_transcribe(speech_to_text)
                     transcription_dict['ibm'] = executor.submit(ibm_transcribe.transcribe, content, 'wav').result()
-                    aws_transcribe = AWS_transcribe(transcribe_client)
-                    transcription_dict['amazon'] = executor.submit(aws_transcribe.transcribe_audio, s3_bucket, filename).result()
+                    #aws_transcribe = AWS_transcribe(transcribe_client)
+                    #transcription_dict['amazon'] = executor.submit(aws_transcribe.transcribe_audio, s3_bucket, filename).result()
 
                 form.textbox.data = transcription_dict['google']
 
