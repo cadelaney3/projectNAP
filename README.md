@@ -1,6 +1,6 @@
 Web app that is hooked up with different text analytics and transcription APIs
 
-to run you will need to make a constanst.json that looks like:
+to run you will need to make a constants.json that looks like:
 
 {
     "AWS_CREDENTIALS": {
@@ -9,7 +9,8 @@ to run you will need to make a constanst.json that looks like:
     },
     "IBM_CREDENTIALS": {
         "IBM_APIKEY": "yourIBMkey",
-        "IBM_URL": "https://gateway.watsonplatform.net/natural-language-understanding/api"
+        "IBM_URL": "https://gateway.watsonplatform.net/natural-language-understanding/api",
+        "IBM_TRANSKEY": "yourIBMiAMkey",
     },
     "AZURE_CREDENTIALS": {
         "AZURE_KEY": "yourAzureKey"

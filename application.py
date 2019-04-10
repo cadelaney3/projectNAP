@@ -41,9 +41,12 @@ import tempfile
 import wave
 import time
 
+# open up all the credentials
 with open('./constants.json') as f:
     CONSTANTS = json.load(f)
 
+# these are used or Google's transcription API, but CHUNK is not used unless
+# 
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
 
@@ -51,6 +54,7 @@ CHUNK = int(RATE / 10)  # 100ms
 AZURE_KEY = CONSTANTS['AZURE_CREDENTIALS']['AZURE_KEY']
 IBM_APIKEY = CONSTANTS['IBM_CREDENTIALS']['IBM_APIKEY']
 IBM_URL = CONSTANTS['IBM_CREDENTIALS']['IBM_URL']
+IBM_TRANSKEY = CONSTANTS['IBM_CREDENTIALS']['IBM_TRANSKEY']
 AWS_ACCESS_KEY = CONSTANTS['AWS_CREDENTIALS']['AWSAccessKeyId']
 AWS_SECRET_KEY = CONSTANTS['AWS_CREDENTIALS']['AWSSecretKey']
 DEEP_AI_KEY = CONSTANTS['DEEP_AI_CREDENTIALS']['DEEP_AI_KEY']
@@ -91,7 +95,7 @@ default_url = "https://stream.watsonplatform.net/speech-to-text/api"
 web_socket = "wss://stream.watsonplatform.net/speech-to-text/api/v1/recognize"
 
 speech_to_text = SpeechToTextV1(
-    iam_apikey="k1lHYY6zTpsvSBAhWNbIDRu9rRRVOwGmbCQvr_vWrsxQ",
+    iam_apikey=IBM_TRANSKEY,
     url=default_url
 )
 
