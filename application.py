@@ -301,7 +301,7 @@ def index():
                 
                 # multithread the transcription stuff
                 with ThreadPoolExecutor(max_workers=3) as executor:
-                    google_speech = Google_ST(gcs_uri, RATE, CHUNK)
+                    google_speech = Google_ST(gcs_uri, RATE)
                     transcription_dict['google'] = executor.submit(google_speech.transcribe_file, gcs_uri).result()
                     ibm_transcribe = IBM_transcribe(speech_to_text)
                     transcription_dict['ibm'] = executor.submit(ibm_transcribe.transcribe, content, 'wav').result()

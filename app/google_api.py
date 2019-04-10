@@ -92,11 +92,10 @@ class Google_Cloud:
         return result
     
 class Google_ST:
-    def __init__(self, file, rate, chunk):
+    def __init__(self, file, rate):
         self.audio_file = file
         self.client = speech1.SpeechClient()
         self.rate = rate
-        self.chunk = chunk
 
     def printFields(self):
         print(type(self.audio_file))
