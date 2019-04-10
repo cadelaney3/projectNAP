@@ -46,10 +46,8 @@ import time
 with open('./constants.json') as f:
     CONSTANTS = json.load(f)
 
-# these are used or Google's transcription API, but CHUNK is not used unless
-# 
+# these are used or Google's transcription API, but CHUNK is not used 
 RATE = 16000
-CHUNK = int(RATE / 10)  # 100ms
 
 
 AZURE_KEY = CONSTANTS['AZURE_CREDENTIALS']['AZURE_KEY']
