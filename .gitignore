@@ -6,3 +6,4 @@
 .vscode/
 constants.json
 google_creds.json
+app/__pychache__/*
