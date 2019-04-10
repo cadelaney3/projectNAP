@@ -24,6 +24,7 @@ from watson_developer_cloud.websocket import RecognizeCallback, AudioSource
 import json
 from os.path import join, dirname
 
+# imports from app folder classes
 from app.google_api import Google_Cloud
 from app.google_api import Google_ST
 from app.azure_api import Azure_API
@@ -105,6 +106,9 @@ class ReusableForm(Form):
 class AudioForm(Form):
     audioFile = FileField('audio')
 
+# upload audio file to Google Cloud storage bucket
+# I named the bucket 'project-nap-bucket'
+
 def upload_audio_file(filename, content, content_type):
     if not filename:
         return None
@@ -125,6 +129,8 @@ def upload_audio_file(filename, content, content_type):
     gcs_uri = 'gs://project-nap-bucket/' + audio_filename
     return gcs_uri    
 
+# Download file from Google Cloud Storage. Might be
+# useful if trying to work with audio file within application.py
 def download_blob(source_blob_name, destination_file_name):
     """Downloads a blob from the bucket."""
     storage_client = storage.Client()
@@ -135,6 +141,10 @@ def download_blob(source_blob_name, destination_file_name):
     #content = blob.download_as_string(storage_client)
     #return content
 
+# function that calls all the text analytics APIs and their functions.
+# Tried to use some multithreading to speed up request time
+# Could probably use more cleanup and better method for speeding up
+# request times
 def analyze(textbox):
     results_dict = {}
 
@@ -171,6 +181,8 @@ def analyze(textbox):
     keywords_dict = {}
     thread_dict = {}
     sub_dict = {}
+
+    # multithreading
     with ThreadPoolExecutor(max_workers=16) as executor:
         google_sub_dict = {}
         try:
@@ -235,6 +247,8 @@ def analyze(textbox):
     deep_ai_dict = thread_dict['deep_ai']
 
     results_dict = {'google': google_dict, 'azure': azure_dict, 'amazon': amazon_dict, 'ibm': ibm_dict, 'deep_ai': deep_ai_dict, 'keywords': keywords_dict}
+    
+    # returns a dict that matches up with what the index.html template needs
     return results_dict
 
 
@@ -255,23 +269,29 @@ def index():
 
     analyze_dict = {'google': init_dict, 'azure': init_dict, 'amazon': init_dict, 'ibm': init_dict, 'deep_ai': init_dict, 'keywords': init_dict}
 
-
+    # if submit button pushed
     if request.method == 'POST':
         
+        # check if there is a file uploaded
         if 'file' in request.files:
+
             f = request.files.get('file')
+
+            # read the audio content
             content = f.read()
             print(f.content_type)
-            #f.save(secure_filename(f.filename))
 
             filename = secure_filename(f.filename)
             filename.replace(" ", '')
             f.seek(0)
             print(filename)
 
+            # upload file to Google Cloud Storage. Audio files longer than 1 minute need this
+            # done so I just did it for everything
             gcs_uri = upload_audio_file(filename, content, f.content_type)
             print(gcs_uri)
 
+            # upload file to AWS s3. Their transcription API needs this done
             s3.Bucket(s3_bucket).put_object(Key=filename, Body=content)
 
             if f.filename.lower().endswith(('.wav', '.flac', '.mp3', '.m4a', '.mp4')):
@@ -281,6 +301,7 @@ def index():
 
             try:
                 
+                # multithread the transcription stuff
                 with ThreadPoolExecutor(max_workers=3) as executor:
                     google_speech = Google_ST(gcs_uri, RATE, CHUNK)
                     transcription_dict['google'] = executor.submit(google_speech.transcribe_file, gcs_uri).result()
@@ -289,6 +310,7 @@ def index():
                     #aws_transcribe = AWS_transcribe(transcribe_client)
                     #transcription_dict['amazon'] = executor.submit(aws_transcribe.transcribe_audio, s3_bucket, filename).result()
 
+                # set the textbox contents to be the google transcription
                 form.textbox.data = transcription_dict['google']
 
  
@@ -296,12 +318,13 @@ def index():
                 print(e)
 
         else:
+            # if their are words in the textbox
             if form.textbox.data: 
                 textbox = form.textbox.data
                 try:
-                    print()
-                    #analyze_dict = analyze(textbox)
-                except Exception:
+                    analyze_dict = analyze(textbox)
+                except Exception as e:
+                    print(e)
                     print("Error: could not analyze text")
     
     else:
