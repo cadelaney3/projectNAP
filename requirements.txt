@@ -22,7 +22,7 @@ ibm-cloud-sdk-core==0.2.0
 ibm-watson==3.0.3
 idna==2.8
 itsdangerous==1.1.0
-Jinja2==2.10
+Jinja2==2.11.3
 jmespath==0.9.3
 MarkupSafe==1.1.0
 protobuf==3.6.1
